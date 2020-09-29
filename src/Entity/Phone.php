@@ -37,6 +37,11 @@ class Phone
      */
     private $internalReference;
 
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
+    private $brand;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,6 +91,18 @@ class Phone
     public function setInternalReference(?string $internalReference): self
     {
         $this->internalReference = $internalReference;
+
+        return $this;
+    }
+
+    public function getBrand(): ?string
+    {
+        return $this->brand;
+    }
+
+    public function setBrand(string $brand): self
+    {
+        $this->brand = $brand;
 
         return $this;
     }

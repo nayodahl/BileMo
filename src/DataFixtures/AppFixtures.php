@@ -2,15 +2,110 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Customer;
+use App\Entity\Phone;
+use App\Entity\Reseller;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
+use Faker\Factory;
 
 class AppFixtures extends Fixture
 {
+    protected $faker;
+
     public function load(ObjectManager $manager)
     {
-        // $product = new Product();
-        // $manager->persist($product);
+        $this->faker = Factory::create();
+
+        // create 7 phones
+        $product = new Phone();
+        $product->setModel('S10')
+        ->setBrand('Samsung')
+        ->setDescription('Samsung Galaxy S10')
+        ->setPrice(759)
+        ->setInternalReference('S10-G981BLBDEUB');
+        $manager->persist($product);
+
+        $product = new Phone();
+        $product->setModel('S10+')
+        ->setBrand('Samsung')
+        ->setDescription('Samsung Galaxy S10+')
+        ->setPrice(859)
+        ->setInternalReference('S10+-G981BLBDEUA');
+        $manager->persist($product);
+
+        $product = new Phone();
+        $product->setModel('S10e')
+        ->setBrand('Samsung')
+        ->setDescription('Galaxy S10e')
+        ->setPrice(759)
+        ->setInternalReference('S10e-G981BLADEUB');
+        $manager->persist($product);
+
+        $product = new Phone();
+        $product->setModel('S20')
+        ->setBrand('Samsung')
+        ->setDescription('Samsung Galaxy S20')
+        ->setPrice(909)
+        ->setInternalReference('S20-G451BLBDEUB');
+        $manager->persist($product);
+
+        $product = new Phone();
+        $product->setModel('Note10')
+        ->setBrand('Samsung')
+        ->setDescription('Samsung Galaxy Note10')
+        ->setPrice(959)
+        ->setInternalReference('N10-G451ARBDEUB');
+        $manager->persist($product);
+
+        $product = new Phone();
+        $product->setModel('iPhone 11')
+        ->setBrand('Apple')
+        ->setDescription('Apple iPhone 11')
+        ->setPrice(809)
+        ->setInternalReference('I11-A451ARBDEUS');
+        $manager->persist($product);
+
+        $product = new Phone();
+        $product->setModel('iPhone XR')
+        ->setBrand('Apple')
+        ->setDescription('Apple iPhone XR')
+        ->setPrice(709)
+        ->setInternalReference('IXR-A887ARBDEUR');
+        $manager->persist($product);
+
+        // create 2 resellers
+        $reseller = new Reseller();
+        $reseller->setUsername('free')
+        ->setPassword('free')
+        ->setEmail($this->faker->companyEmail);
+        $manager->persist($reseller);
+
+        // create 10 customers for this reseller
+        for ($i = 1; $i <= 10; ++$i) {
+            $customer = new Customer();
+            $customer->setFirstname($this->faker->firstName)
+                ->setLastname($this->faker->lastName)
+                ->setEmail($this->faker->freeEmail)
+                ->setReseller($reseller);
+            $manager->persist($customer);
+        }
+
+        $reseller = new Reseller();
+        $reseller->setUsername('ldlc')
+        ->setPassword('ldlc')
+        ->setEmail($this->faker->companyEmail);
+        $manager->persist($reseller);
+
+        // create 10 customers for this reseller
+        for ($i = 1; $i <= 10; ++$i) {
+            $customer = new Customer();
+            $customer->setFirstname($this->faker->firstName)
+                ->setLastname($this->faker->lastName)
+                ->setEmail($this->faker->freeEmail)
+                ->setReseller($reseller);
+            $manager->persist($customer);
+        }
 
         $manager->flush();
     }
