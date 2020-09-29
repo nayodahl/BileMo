@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\CustomerRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
@@ -19,16 +20,19 @@ class Customer
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"show_resellers", "show_customers"})
      */
     private $firstname;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"show_resellers", "show_customers"})
      */
     private $lastname;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Groups({"show_resellers", "show_customers"})
      */
     private $email;
 

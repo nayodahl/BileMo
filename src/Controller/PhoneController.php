@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Repository\PhoneRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -10,22 +11,23 @@ class PhoneController extends AbstractController
     /**
      * @Route("/api/phones/{id}", name="phone")
      */
-    public function showPhone()
+    public function showPhone(int $id, PhoneRepository $phoneRepo)
     {
-        return $this->json([
-            'message' => 'Detail of a phone',
-            'path' => 'src/Controller/PhoneController.php',
-        ]);
+        $phone = $phoneRepo->find($id);
+        if (null !== $phone) {
+            return  $this->json($phone, 200);
+        }
+
+        return $this->json(null, 404);
     }
 
     /**
      * @Route("/api/phones", name="phones")
      */
-    public function showPhones()
+    public function showPhones(PhoneRepository $phoneRepo)
     {
-        return $this->json([
-            'message' => 'List of all phones with some infos',
-            'path' => 'src/Controller/PhoneController.php',
-        ]);
+        $phones = $phoneRepo->findAll();
+
+        return $this->json($phones, 200);
     }
 }
