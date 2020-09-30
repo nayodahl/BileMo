@@ -16,6 +16,7 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CustomerController extends AbstractController
 {
@@ -60,7 +61,7 @@ class CustomerController extends AbstractController
     /**
      * @Route("/api/resellers/{resellerId}/customers", methods="POST", name="app_create_customer")
      */
-    public function CreateCustomer(int $resellerId, ResellerRepository $resellerRepo, Request $request)
+    public function CreateCustomer(int $resellerId, ResellerRepository $resellerRepo, Request $request, ValidatorInterface $validator)
     {
         $reseller = new Reseller();
         $reseller = $resellerRepo->find($resellerId);
@@ -72,11 +73,16 @@ class CustomerController extends AbstractController
         $customer = $serializer->deserialize($request->getContent(), Customer::class, 'json');
         $customer->setReseller($reseller);
 
+        $errors = $validator->validate($customer);
+        if (count($errors) > 0) {
+            return $this->json(['message' => $errors], 400);
+        }
+
         $em = $this->getDoctrine()->getManager();
         $em->persist($customer);
         $em->flush();
 
-        return $this->json('customer created', 201);
+        return $this->json(['message' => 'customer created'], 201);
     }
 
     /**
@@ -91,9 +97,9 @@ class CustomerController extends AbstractController
             $em->remove($customer);
             $em->flush();
 
-            return $this->json(null, 204);
+            return $this->json(['message' => 'customer has been deleted'], 204);
         }
 
-        return $this->json(null, 404);
+        return $this->json(['message' => 'customer does not exist'], 404);
     }
 }

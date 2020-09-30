@@ -30,7 +30,7 @@ class ResellerController extends AbstractController
             return new JsonResponse($data);
         }
 
-        return $this->json(null, 404);
+        return $this->json(['message' => 'this reseller does not exist'], 404);
     }
 
     /**
@@ -49,6 +49,6 @@ class ResellerController extends AbstractController
             return new JsonResponse($data);
         }
 
-        return $this->json(null, 404);
+        return $this->json(['message' => 'there is no reseller for the moment'], 404);
     }
 }

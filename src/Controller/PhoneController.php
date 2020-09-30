@@ -18,7 +18,7 @@ class PhoneController extends AbstractController
             return  $this->json($phone, 200);
         }
 
-        return $this->json(null, 404);
+        return $this->json(['message' => 'this phone does not exist'], 404);
     }
 
     /**
@@ -27,7 +27,10 @@ class PhoneController extends AbstractController
     public function showPhones(PhoneRepository $phoneRepo)
     {
         $phones = $phoneRepo->findAll();
+        if (null !== $phones) {
+            return  $this->json($phones, 200);
+        }
 
-        return $this->json($phones, 200);
+        return $this->json(['message' => 'there is no phone for the moment'], 404);
     }
 }
