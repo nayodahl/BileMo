@@ -15,15 +15,15 @@ use Symfony\Component\Serializer\Serializer;
 class ResellerController extends AbstractController
 {
     /**
-     * @Route("/api/resellers/{id}", name="reseller")
+     * @Route("/api/resellers/{resellerId}", methods="GET", name="reseller")
      */
-    public function showReseller(int $id, ResellerRepository $resellerRepo)
+    public function showReseller(int $resellerId, ResellerRepository $resellerRepo)
     {
         $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
         $normalizer = new ObjectNormalizer($classMetadataFactory);
         $serializer = new Serializer([$normalizer]);
 
-        $reseller = $resellerRepo->find($id);
+        $reseller = $resellerRepo->find($resellerId);
         if (null !== $reseller) {
             $data = $serializer->normalize($reseller, 'json', ['groups' => 'show_resellers']);
 
@@ -34,7 +34,7 @@ class ResellerController extends AbstractController
     }
 
     /**
-     * @Route("/api/resellers", name="resellers")
+     * @Route("/api/resellers", methods="GET", name="resellers")
      */
     public function showResellers(ResellerRepository $resellerRepo)
     {

@@ -9,11 +9,11 @@ use Symfony\Component\Routing\Annotation\Route;
 class PhoneController extends AbstractController
 {
     /**
-     * @Route("/api/phones/{id}", name="phone")
+     * @Route("/api/phones/{phoneId}", methods="GET", name="phone")
      */
-    public function showPhone(int $id, PhoneRepository $phoneRepo)
+    public function showPhone(int $phoneId, PhoneRepository $phoneRepo)
     {
-        $phone = $phoneRepo->find($id);
+        $phone = $phoneRepo->find($phoneId);
         if (null !== $phone) {
             return  $this->json($phone, 200);
         }
@@ -22,7 +22,7 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * @Route("/api/phones", name="phones")
+     * @Route("/api/phones", methods="GET", name="phones")
      */
     public function showPhones(PhoneRepository $phoneRepo)
     {
