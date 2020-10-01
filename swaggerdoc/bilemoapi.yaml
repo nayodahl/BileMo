@@ -1,0 +1,11 @@
+openapi: 3.0.0
+info:
+  title: 'My First API'
+  version: 1.0.0
+paths:
+  /api/phones:
+    get:
+      operationId: 'App\Controller\PhoneController::showPhones'
+      responses:
+        '200':
+          description: 'Get all phones'

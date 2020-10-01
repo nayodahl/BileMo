@@ -5,9 +5,15 @@ namespace App\Controller;
 use App\Repository\PhoneRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
+use OpenApi\Annotations as OA;
+
+/**
+ * @OA\Info(title="My First API", version="1.0.0")
+ */
 
 class PhoneController extends AbstractController
-{
+{   
+    
     /**
      * @Route("/api/phones/{phoneId}", methods="GET", name="phone")
      */
@@ -23,6 +29,10 @@ class PhoneController extends AbstractController
 
     /**
      * @Route("/api/phones", methods="GET", name="phones")
+     * @OA\Get(
+     *      path="/api/phones", 
+     *      @OA\Response(response="200", description="Get all phones")
+     * )
      */
     public function showPhones(PhoneRepository $phoneRepo)
     {

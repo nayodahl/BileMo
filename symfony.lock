@@ -354,5 +354,8 @@
     },
     "webmozart/assert": {
         "version": "1.9.1"
+    },
+    "zircote/swagger-php": {
+        "version": "3.1.0"
     }
 }
