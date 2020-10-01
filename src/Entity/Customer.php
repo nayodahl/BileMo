@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
  * @UniqueEntity("email")
+ * @OA\Schema()
  */
 class Customer
 {
@@ -25,6 +26,7 @@ class Customer
      * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers", "show_customers"})
      * @Assert\NotBlank
+     * @OA\Property()
      */
     private $firstname;
 
@@ -32,6 +34,7 @@ class Customer
      * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers", "show_customers"})
      * @Assert\NotBlank
+     * @OA\Property()
      */
     private $lastname;
 
@@ -42,12 +45,14 @@ class Customer
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
      * )
+     * @OA\Property()
      */
     private $email;
 
     /**
      * @ORM\ManyToOne(targetEntity=Reseller::class, inversedBy="customer")
      * @ORM\JoinColumn(nullable=false)
+     * @OA\Property()
      */
     private $reseller;
 

@@ -5,10 +5,15 @@ namespace App\Entity;
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use OpenApi\Annotations as OA;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
  * @UniqueEntity("internalReference")
+ * @OA\Schema(
+ *     description="Phone model",
+ *     title="Phone",
+ * )
  */
 class Phone
 {
@@ -16,33 +21,60 @@ class Phone
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @OA\Property(
+     *     format="int64",
+     *     description="ID",
+     *     title="ID",
+     * )
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @OA\Property(
+     *     description="phone Brand",
+     *     title="Brand",
+     * )
+     */
+    private $brand;
+    
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @OA\Property(
+     *     description="phone Model",
+     *     title="Model",
+     * )
      */
     private $model;
 
     /**
      * @ORM\Column(type="text")
+     * @OA\Property(
+     *     description="phone Description",
+     *     title="Description",
+     * )
      */
     private $description;
 
     /**
      * @ORM\Column(type="float")
+     * @OA\Property(
+     *     format="float",
+     *     description="phone Price",
+     *     title="Price",
+     * )
      */
     private $price;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
+     * @OA\Property(
+     *     description="phone Internal Reference",
+     *     title="Internal Reference",
+     * )
      */
     private $internalReference;
 
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $brand;
 
     public function getId(): ?int
     {

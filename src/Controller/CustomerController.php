@@ -17,11 +17,43 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use OpenApi\Annotations as OA;
 
 class CustomerController extends AbstractController
 {
     /**
+     * Get the detail of a customer
+     * 
      * @Route("/api/resellers/{resellerId}/customers/{customerId}", methods="GET", name="app_customer")
+     * @OA\Get(
+     *      path="/api/resellers/{resellerId}/customers/{customerId}", 
+     *      tags={"customer"},
+     *      summary="Find customer by ID",
+     *      description="Returns a single customer",
+     *      @OA\Parameter(
+     *          name="customerId",
+     *          in="path",
+     *          description="ID of customer to return",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int"
+     *               )
+     *      ),
+     *      @OA\Response(
+     *          response="200",
+     *          description="successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Customer"),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="customer not found"
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Invalid ID supplier"
+     *     )
+     * )
      */
     public function showCustomer(int $customerId, CustomerRepository $customerRepo)
     {
@@ -40,7 +72,23 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * Get the list of all customers of a given reseller
+     * 
      * @Route("/api/resellers/{resellerId}/customers", methods="GET", name="app_customers")
+     * @OA\Get(
+     *      path="/api/resellers/{resellerId}/customers", 
+     *      tags={"customer"},
+     *      summary="Find all phones",
+     *      description="Returns a list of all customers of a given reseller",
+     *      @OA\Response(
+     *          response="200",
+     *          description="successful operation",
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="there is no customer for the moment"
+     *      ),
+     * )
      */
     public function showCustomers(CustomerRepository $customerRepo)
     {
@@ -59,7 +107,22 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * Create a new customer
+     * 
      * @Route("/api/resellers/{resellerId}/customers", methods="POST", name="app_create_customer")
+     * @OA\Post(
+     *      path="/api/resellers/{resellerId}/customers", 
+     *      tags={"customer"},
+     *      summary="Creates a new customer",
+     *      @OA\Response(
+     *          response="201", 
+     *          description="Create a new customer"
+     *      ),
+     *      @OA\Response(
+     *         response=400,
+     *         description="Invalid input"
+     *      ),
+     * )
      */
     public function CreateCustomer(int $resellerId, ResellerRepository $resellerRepo, Request $request, ValidatorInterface $validator)
     {
@@ -86,7 +149,32 @@ class CustomerController extends AbstractController
     }
 
     /**
+     * Delete a customer
+     * 
      * @Route("/api/resellers/{resellerId}/customers/{customerId}", methods="DELETE", name="app_delete_customer")
+     * @OA\Delete(
+     *      path="/api/resellers/{resellerId}/customers/{customerId}", 
+     *      tags={"customer"},
+     *      summary="Deletes a customer",
+     *      @OA\Parameter(
+     *         name="customerId",
+     *         in="path",
+     *         description="Customer ID to delete",
+     *         required=true,
+     *         @OA\Schema(
+     *             type="integer",
+     *             format="int"
+     *         ),
+     *      ),
+     *      @OA\Response(
+     *          response="204", 
+     *          description="Delete a customer"
+     *      ),
+     *      @OA\Response(
+     *         response=404,
+     *         description="Customer not found",
+     *      ),
+     * )
      */
     public function DeleteCustomer(int $customerId, CustomerRepository $customerRepo)
     {

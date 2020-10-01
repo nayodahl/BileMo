@@ -12,6 +12,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
 /**
  * @ORM\Entity(repositoryClass=ResellerRepository::class)
  * @UniqueEntity("email")
+ * @OA\Schema()
  */
 class Reseller
 {
@@ -25,6 +26,7 @@ class Reseller
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers"})
+     * @OA\Property()
      */
     private $username;
 
@@ -36,6 +38,7 @@ class Reseller
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Groups({"show_resellers"})
+     * @OA\Property()
      */
     private $email;
 

@@ -11,11 +11,42 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
+use OpenApi\Annotations as OA;
 
 class ResellerController extends AbstractController
 {
     /**
-     * @Route("/api/resellers/{resellerId}", methods="GET", name="reseller")
+     * Get the detail of a reseller
+     * 
+     * @OA\Get(
+     *      path="/api/resellers/{resellerId}", 
+     *      tags={"reseller"},
+     *      summary="Find reseller by ID",
+     *      description="Returns a single reseller",
+     *      @OA\Parameter(
+     *          name="resellerId",
+     *          in="path",
+     *          description="ID of reseller to return",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int"
+     *               )
+     *      ),
+     *      @OA\Response(
+     *          response="200",
+     *          description="successful operation",
+     *          @OA\JsonContent(ref="#/components/schemas/Reseller"),
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="Reseller not found"
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Invalid ID supplier"
+     *     )
+     * )
      */
     public function showReseller(int $resellerId, ResellerRepository $resellerRepo)
     {
@@ -34,7 +65,23 @@ class ResellerController extends AbstractController
     }
 
     /**
+     * Get the list of all resellers
+     * 
      * @Route("/api/resellers", methods="GET", name="resellers")
+     * @OA\Get(
+     *      path="/api/resellers", 
+     *      tags={"reseller"},
+     *      summary="Find all resellers",
+     *      description="Returns a list of all resellers",
+     *      @OA\Response(
+     *          response="200",
+     *          description="successful operation",
+     *      ),
+     *      @OA\Response(
+     *          response=404,
+     *          description="there is no reseller for the moment"
+     *      ),
+     * )
      */
     public function showResellers(ResellerRepository $resellerRepo)
     {
