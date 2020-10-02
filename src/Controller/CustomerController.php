@@ -31,6 +31,16 @@ class CustomerController extends AbstractController
      *      summary="Find customer by ID",
      *      description="Returns a single customer",
      *      @OA\Parameter(
+     *          name="resellerId",
+     *          in="path",
+     *          description="ID of reseller",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int"
+     *               )
+     *      ),
+     *      @OA\Parameter(
      *          name="customerId",
      *          in="path",
      *          description="ID of customer to return",
@@ -78,8 +88,18 @@ class CustomerController extends AbstractController
      * @OA\Get(
      *      path="/api/resellers/{resellerId}/customers",
      *      tags={"customer"},
-     *      summary="Find all phones",
+     *      summary="Find all customers",
      *      description="Returns a list of all customers of a given reseller",
+     *      @OA\Parameter(
+     *          name="resellerId",
+     *          in="path",
+     *          description="ID of reseller",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int"
+     *               )
+     *      ),
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
@@ -114,6 +134,17 @@ class CustomerController extends AbstractController
      *      path="/api/resellers/{resellerId}/customers",
      *      tags={"customer"},
      *      summary="Creates a new customer",
+     *      description="Creates a new customer linked to a given reseller",
+     *      @OA\Parameter(
+     *          name="resellerId",
+     *          in="path",
+     *          description="ID of reseller",
+     *          required=true,
+     *          @OA\Schema(
+     *              type="integer",
+     *              format="int"
+     *               )
+     *      ),
      *      @OA\Response(
      *          response="201",
      *          description="Create a new customer"
@@ -156,6 +187,7 @@ class CustomerController extends AbstractController
      *      path="/api/resellers/{resellerId}/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Deletes a customer",
+     *      description="Delete a customer linked to a given reseller",
      *      @OA\Parameter(
      *         name="customerId",
      *         in="path",

@@ -13,6 +13,14 @@ paths:
       operationId: 'App\Controller\CustomerController::showCustomer'
       parameters:
         -
+          name: resellerId
+          in: path
+          description: 'ID of reseller'
+          required: true
+          schema:
+            type: integer
+            format: int
+        -
           name: customerId
           in: path
           description: 'ID of customer to return'
@@ -35,6 +43,7 @@ paths:
       tags:
         - customer
       summary: 'Deletes a customer'
+      description: 'Delete a customer linked to a given reseller'
       operationId: 'App\Controller\CustomerController::DeleteCustomer'
       parameters:
         -
@@ -54,9 +63,18 @@ paths:
     get:
       tags:
         - customer
-      summary: 'Find all phones'
+      summary: 'Find all customers'
       description: 'Returns a list of all customers of a given reseller'
       operationId: 'App\Controller\CustomerController::showCustomers'
+      parameters:
+        -
+          name: resellerId
+          in: path
+          description: 'ID of reseller'
+          required: true
+          schema:
+            type: integer
+            format: int
       responses:
         '200':
           description: 'successful operation'
@@ -66,7 +84,17 @@ paths:
       tags:
         - customer
       summary: 'Creates a new customer'
+      description: 'Creates a new customer linked to a given reseller'
       operationId: 'App\Controller\CustomerController::CreateCustomer'
+      parameters:
+        -
+          name: resellerId
+          in: path
+          description: 'ID of reseller'
+          required: true
+          schema:
+            type: integer
+            format: int
       responses:
         '201':
           description: 'Create a new customer'
