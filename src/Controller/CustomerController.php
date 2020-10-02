@@ -7,6 +7,7 @@ use App\Entity\Reseller;
 use App\Repository\CustomerRepository;
 use App\Repository\ResellerRepository;
 use Doctrine\Common\Annotations\AnnotationReader;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -17,16 +18,15 @@ use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use OpenApi\Annotations as OA;
 
 class CustomerController extends AbstractController
 {
     /**
-     * Get the detail of a customer
-     * 
+     * Get the detail of a customer.
+     *
      * @Route("/api/resellers/{resellerId}/customers/{customerId}", methods="GET", name="app_customer")
      * @OA\Get(
-     *      path="/api/resellers/{resellerId}/customers/{customerId}", 
+     *      path="/api/resellers/{resellerId}/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Find customer by ID",
      *      description="Returns a single customer",
@@ -72,11 +72,11 @@ class CustomerController extends AbstractController
     }
 
     /**
-     * Get the list of all customers of a given reseller
-     * 
+     * Get the list of all customers of a given reseller.
+     *
      * @Route("/api/resellers/{resellerId}/customers", methods="GET", name="app_customers")
      * @OA\Get(
-     *      path="/api/resellers/{resellerId}/customers", 
+     *      path="/api/resellers/{resellerId}/customers",
      *      tags={"customer"},
      *      summary="Find all phones",
      *      description="Returns a list of all customers of a given reseller",
@@ -107,15 +107,15 @@ class CustomerController extends AbstractController
     }
 
     /**
-     * Create a new customer
-     * 
+     * Create a new customer.
+     *
      * @Route("/api/resellers/{resellerId}/customers", methods="POST", name="app_create_customer")
      * @OA\Post(
-     *      path="/api/resellers/{resellerId}/customers", 
+     *      path="/api/resellers/{resellerId}/customers",
      *      tags={"customer"},
      *      summary="Creates a new customer",
      *      @OA\Response(
-     *          response="201", 
+     *          response="201",
      *          description="Create a new customer"
      *      ),
      *      @OA\Response(
@@ -149,11 +149,11 @@ class CustomerController extends AbstractController
     }
 
     /**
-     * Delete a customer
-     * 
+     * Delete a customer.
+     *
      * @Route("/api/resellers/{resellerId}/customers/{customerId}", methods="DELETE", name="app_delete_customer")
      * @OA\Delete(
-     *      path="/api/resellers/{resellerId}/customers/{customerId}", 
+     *      path="/api/resellers/{resellerId}/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Deletes a customer",
      *      @OA\Parameter(
@@ -167,7 +167,7 @@ class CustomerController extends AbstractController
      *         ),
      *      ),
      *      @OA\Response(
-     *          response="204", 
+     *          response="204",
      *          description="Delete a customer"
      *      ),
      *      @OA\Response(

@@ -3,26 +3,18 @@
 namespace App\Controller;
 
 use App\Repository\PhoneRepository;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use OpenApi\Annotations as OA;
-
-/**
- * @OA\Info(
- *   title="BileMo API", 
- *   version="1.0.0"
- * )
- */
 
 class PhoneController extends AbstractController
-{   
-    
+{
     /**
-     * Get the detail of a phone
-     * 
-     * @Route("/api/phones/{phoneId}", methods="GET", name="phone")
+     * Get the detail of a phone.
+     *
+     * @Route("/api/phones/{phoneId}", methods="GET", name="app_phone")
      * @OA\Get(
-     *      path="/api/phones/{phoneId}", 
+     *      path="/api/phones/{phoneId}",
      *      tags={"phone"},
      *      summary="Find phone by ID",
      *      description="Returns a single phone",
@@ -62,11 +54,11 @@ class PhoneController extends AbstractController
     }
 
     /**
-     * Get a list of all phones
-     * 
-     * @Route("/api/phones", methods="GET", name="phones")
+     * Get a list of all phones.
+     *
+     * @Route("/api/phones", methods="GET", name="app_phones")
      * @OA\Get(
-     *      path="/api/phones", 
+     *      path="/api/phones",
      *      tags={"phone"},
      *      summary="Find all phones",
      *      description="Returns a list of all phones",

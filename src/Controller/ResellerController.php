@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\ResellerRepository;
 use Doctrine\Common\Annotations\AnnotationReader;
+use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
@@ -11,15 +12,15 @@ use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
 use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
-use OpenApi\Annotations as OA;
 
 class ResellerController extends AbstractController
 {
     /**
-     * Get the detail of a reseller
-     * 
+     * Get the detail of a reseller.
+     *
+     * @Route("/api/resellers/{resellerId}", methods="GET", name="app_reseller")
      * @OA\Get(
-     *      path="/api/resellers/{resellerId}", 
+     *      path="/api/resellers/{resellerId}",
      *      tags={"reseller"},
      *      summary="Find reseller by ID",
      *      description="Returns a single reseller",
@@ -65,11 +66,11 @@ class ResellerController extends AbstractController
     }
 
     /**
-     * Get the list of all resellers
-     * 
-     * @Route("/api/resellers", methods="GET", name="resellers")
+     * Get the list of all resellers.
+     *
+     * @Route("/api/resellers", methods="GET", name="app_resellers")
      * @OA\Get(
-     *      path="/api/resellers", 
+     *      path="/api/resellers",
      *      tags={"reseller"},
      *      summary="Find all resellers",
      *      description="Returns a list of all resellers",

@@ -4,8 +4,8 @@ namespace App\Entity;
 
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use OpenApi\Annotations as OA;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 /**
  * @ORM\Entity(repositoryClass=PhoneRepository::class)
@@ -37,7 +37,7 @@ class Phone
      * )
      */
     private $brand;
-    
+
     /**
      * @ORM\Column(type="string", length=255)
      * @OA\Property(
@@ -74,7 +74,6 @@ class Phone
      * )
      */
     private $internalReference;
-
 
     public function getId(): ?int
     {

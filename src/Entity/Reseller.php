@@ -6,13 +6,17 @@ use App\Repository\ResellerRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use OpenApi\Annotations as OA;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Annotation\Groups;
 
 /**
  * @ORM\Entity(repositoryClass=ResellerRepository::class)
  * @UniqueEntity("email")
- * @OA\Schema()
+ * @OA\Schema(
+ *      description="Reseller model",
+ *      title="Reseller",
+ * )
  */
 class Reseller
 {
@@ -20,13 +24,22 @@ class Reseller
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @Groups({"show_resellers"})
+     * @OA\Property(
+     *     format="int64",
+     *     description="ID",
+     *     title="ID",
+     * )
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers"})
-     * @OA\Property()
+     * @OA\Property(
+     *     description="reseller Username",
+     *     title="Username",
+     * )
      */
     private $username;
 
@@ -38,7 +51,10 @@ class Reseller
     /**
      * @ORM\Column(type="string", length=255, unique=true)
      * @Groups({"show_resellers"})
-     * @OA\Property()
+     * @OA\Property(
+     *     description="reseller Email",
+     *     title="Email",
+     * )
      */
     private $email;
 

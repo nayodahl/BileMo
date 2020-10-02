@@ -1,6 +1,7 @@
 openapi: 3.0.0
 info:
   title: 'BileMo API'
+  description: 'This is the documention for Bilemo API.'
   version: 1.0.0
 paths:
   '/api/resellers/{resellerId}/customers/{customerId}':
@@ -152,14 +153,28 @@ paths:
 components:
   schemas:
     Customer:
+      title: Customer
+      description: 'Customer model'
       properties:
-        firstname: {  }
-        lastname: {  }
-        email: {  }
-        reseller: {  }
+        id:
+          title: ID
+          description: ID
+          format: int64
+        firstname:
+          title: Firstname
+          description: 'customer Firstname'
+        lastname:
+          title: Lastname
+          description: 'customer Lastname'
+        email:
+          title: Email
+          description: 'customer Email'
+        reseller:
+          title: Reseller
+          description: 'customer parent Reseller'
       type: object
     Phone:
-      title: 'Phone model'
+      title: Phone
       description: 'Phone model'
       properties:
         id:
@@ -184,7 +199,17 @@ components:
           description: 'phone Internal Reference'
       type: object
     Reseller:
+      title: Reseller
+      description: 'Reseller model'
       properties:
-        username: {  }
-        email: {  }
+        id:
+          title: ID
+          description: ID
+          format: int64
+        username:
+          title: Username
+          description: 'reseller Username'
+        email:
+          title: Email
+          description: 'reseller Email'
       type: object
