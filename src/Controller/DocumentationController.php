@@ -16,16 +16,9 @@ use Symfony\Component\Routing\Annotation\Route;
 class DocumentationController extends AbstractController
 {
     /**
-     * Default route used to redirect to documention.
+     * Default route used to show documention.
      *
      * @Route("/", name="app_default")
-     */
-    public function index()
-    {
-        return $this->redirectToRoute('app_documentation');
-    }
-
-    /**
      * @Route("/api/doc", name="app_documentation")
      */
     public function showDocumentation()

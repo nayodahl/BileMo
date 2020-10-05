@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\PhoneRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PhoneController extends AbstractController
@@ -43,7 +44,7 @@ class PhoneController extends AbstractController
      *     )
      * )
      */
-    public function showPhone(int $phoneId, PhoneRepository $phoneRepo)
+    public function showPhone(int $phoneId, PhoneRepository $phoneRepo): JsonResponse
     {
         $phone = $phoneRepo->find($phoneId);
         if (null !== $phone) {
@@ -72,7 +73,7 @@ class PhoneController extends AbstractController
      *      ),
      * )
      */
-    public function showPhones(PhoneRepository $phoneRepo)
+    public function showPhones(PhoneRepository $phoneRepo): JsonResponse
     {
         $phones = $phoneRepo->findAll();
         if (null !== $phones) {

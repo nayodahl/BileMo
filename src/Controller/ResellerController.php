@@ -3,15 +3,10 @@
 namespace App\Controller;
 
 use App\Repository\ResellerRepository;
-use Doctrine\Common\Annotations\AnnotationReader;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Routing\Annotation\Route;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 
 class ResellerController extends AbstractController
 {
@@ -49,17 +44,11 @@ class ResellerController extends AbstractController
      *     )
      * )
      */
-    public function showReseller(int $resellerId, ResellerRepository $resellerRepo)
+    public function showReseller(int $resellerId, ResellerRepository $resellerRepo): JsonResponse
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
-
         $reseller = $resellerRepo->find($resellerId);
         if (null !== $reseller) {
-            $data = $serializer->normalize($reseller, 'json', ['groups' => 'show_resellers']);
-
-            return new JsonResponse($data);
+            return $this->json($reseller, 200, [], ['groups' => 'show_resellers']);
         }
 
         return $this->json(['message' => 'this reseller does not exist'], 404);
@@ -84,17 +73,11 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function showResellers(ResellerRepository $resellerRepo)
+    public function showResellers(ResellerRepository $resellerRepo): JsonResponse
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
-
         $resellers = $resellerRepo->findAll();
         if (null !== $resellers) {
-            $data = $serializer->normalize($resellers, 'json', ['groups' => 'show_resellers']);
-
-            return new JsonResponse($data);
+            return $this->json($resellers, 200, [], ['groups' => 'show_resellers']);
         }
 
         return $this->json(['message' => 'there is no reseller for the moment'], 404);

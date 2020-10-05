@@ -6,15 +6,12 @@ use App\Entity\Customer;
 use App\Entity\Reseller;
 use App\Repository\CustomerRepository;
 use App\Repository\ResellerRepository;
-use Doctrine\Common\Annotations\AnnotationReader;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactory;
-use Symfony\Component\Serializer\Mapping\Loader\AnnotationLoader;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -65,20 +62,14 @@ class CustomerController extends AbstractController
      *     )
      * )
      */
-    public function showCustomer(int $customerId, CustomerRepository $customerRepo)
+    public function showCustomer(int $customerId, CustomerRepository $customerRepo): JsonResponse
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
-
         $customer = $customerRepo->find($customerId);
         if (null !== $customer) {
-            $data = $serializer->normalize($customer, 'json', ['groups' => 'show_customers']);
-
-            return new JsonResponse($data);
+            return $this->json($customer, 200, [], ['groups' => 'show_customers']);
         }
 
-        return $this->json(null, 404);
+        return $this->json(['message' => 'this customer does not exist'], 404);
     }
 
     /**
@@ -110,20 +101,14 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function showCustomers(CustomerRepository $customerRepo)
+    public function showCustomers(CustomerRepository $customerRepo): JsonResponse
     {
-        $classMetadataFactory = new ClassMetadataFactory(new AnnotationLoader(new AnnotationReader()));
-        $normalizer = new ObjectNormalizer($classMetadataFactory);
-        $serializer = new Serializer([$normalizer]);
-
         $customers = $customerRepo->findAll();
         if (null !== $customers) {
-            $data = $serializer->normalize($customers, 'json', ['groups' => 'show_customers']);
-
-            return new JsonResponse($data);
+            return $this->json($customers, 200, [], ['groups' => 'show_customers']);
         }
 
-        return $this->json(null, 404);
+        return $this->json(['message' => 'there is no customer for the moment'], 404);
     }
 
     /**
@@ -155,7 +140,7 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function CreateCustomer(int $resellerId, ResellerRepository $resellerRepo, Request $request, ValidatorInterface $validator)
+    public function CreateCustomer(int $resellerId, ResellerRepository $resellerRepo, Request $request, ValidatorInterface $validator): JsonResponse
     {
         $reseller = new Reseller();
         $reseller = $resellerRepo->find($resellerId);
@@ -208,7 +193,7 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function DeleteCustomer(int $customerId, CustomerRepository $customerRepo)
+    public function DeleteCustomer(int $customerId, CustomerRepository $customerRepo): JsonResponse
     {
         $customer = $customerRepo->find($customerId);
 
