@@ -1,0 +1,36 @@
+{
+  "name": "bilemo",
+  "version": "1.0.0",
+  "description": "API Rest project for a Smartphones seller company, done for OPENCLASSROOMS, made with Symfony",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack",
+    "start": "webpack-dev-server --open"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nayodahl/bilemo.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nayodahl/bilemo/issues"
+  },
+  "homepage": "https://github.com/nayodahl/bilemo#readme",
+  "devDependencies": {
+    "clean-webpack-plugin": "^1.0.1",
+    "copy-webpack-plugin": "^4.6.0",
+    "html-webpack-plugin": "^3.2.0",
+    "webpack": "^4.29.3",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14"
+  },
+  "dependencies": {
+    "css-loader": "^2.1.0",
+    "json-loader": "^0.5.7",
+    "style-loader": "^0.23.1",
+    "swagger-ui": "^3.20.7",
+    "yaml-loader": "^0.5.0"
+  }
+}
