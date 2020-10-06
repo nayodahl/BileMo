@@ -2,11 +2,18 @@
 
 namespace App\Controller;
 
+use App\Entity\Reseller;
 use App\Repository\ResellerRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
+use Symfony\Component\Serializer\Encoder\JsonEncoder;
+use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ResellerController extends AbstractController
 {
@@ -81,5 +88,34 @@ class ResellerController extends AbstractController
         }
 
         return $this->json(['message' => 'there is no reseller for the moment'], 404);
+    }
+
+    /**
+     * @Route ("/api/auth/signin", name = "api_signin", methods = "POST")
+     */
+    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator)
+    {
+        $encoder = [new JsonEncoder()];
+        $normalizers = [new ObjectNormalizer()];
+        $serializer = new Serializer($normalizers, $encoder);
+
+        $data = $request->getContent();
+
+        $reseller = $serializer->deserialize($data, Reseller::class, 'json');
+
+        // check if input data is valid (email valid and unique, password complex enough)
+        $errors = $validator->validate($reseller);
+        if (count($errors) > 0) {
+            return $this->json(['message' => $errors], 400);
+        }
+
+        // encode password
+        $reseller->setPassword($passwordEncoder->encodePassword($reseller, $reseller->getPassword()));
+
+        $manager = $this->getDoctrine()->getManager();
+        $manager->persist($reseller);
+        $manager->flush();
+
+        return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 }

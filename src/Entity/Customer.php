@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\CustomerRepository;
+use App\Validator as UserAssert;
 use Doctrine\ORM\Mapping as ORM;
 use OpenApi\Annotations as OA;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -36,6 +37,7 @@ class Customer
      * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers", "show_customers"})
      * @Assert\NotBlank
+     * @UserAssert\IsValidName
      * @OA\Property(
      *     description="customer Firstname",
      *     title="Firstname",
@@ -47,6 +49,7 @@ class Customer
      * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers", "show_customers"})
      * @Assert\NotBlank
+     * @UserAssert\IsValidName
      * @OA\Property(
      *     description="customer Lastname",
      *     title="Lastname",

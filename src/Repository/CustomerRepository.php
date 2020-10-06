@@ -22,7 +22,7 @@ class CustomerRepository extends ServiceEntityRepository
     /**
      * Return all customers of a given Reseller.
      */
-    public function findAllCustomersofOneReseller(int $resellerId)
+    public function findAllCustomersofOneReseller(int $resellerId): ?array
     {
         return $this->createQueryBuilder('c')
         ->innerJoin('c.reseller', 'cr')->addSelect('cr')
@@ -35,7 +35,7 @@ class CustomerRepository extends ServiceEntityRepository
     /**
      * Return single customer of a given Reseller, or null.
      */
-    public function findOneCustomerofOneReseller(int $resellerId, int $customerId)
+    public function findOneCustomerofOneReseller(int $resellerId, int $customerId): ?Customer
     {
         return $this->createQueryBuilder('c')
         ->innerJoin('c.reseller', 'cr')->addSelect('cr')
