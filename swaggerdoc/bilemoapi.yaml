@@ -69,6 +69,27 @@ paths:
       summary: 'Creates a new customer'
       description: 'Creates a new customer linked to a logged reseller'
       operationId: 'App\Controller\CustomerController::CreateCustomer'
+      requestBody:
+        description: 'Creates a new customer linked to a logged reseller'
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                firstname:
+                  description: 'enter the firstname of the customer'
+                  type: string
+                lastname:
+                  description: 'enter the lastname of the customer'
+                  type: string
+                email:
+                  description: 'enter the email of the customer'
+                  type: string
+              type: object
+              example:
+                firstname: Emily
+                lastname: Cooper
+                email: emily.cooper@mymail.com
       responses:
         '201':
           description: 'Create a new customer'
@@ -152,6 +173,63 @@ paths:
           description: 'successful operation'
         '404':
           description: 'there is no reseller for the moment'
+  /api/auth/signin:
+    post:
+      tags:
+        - 'login and signin'
+      summary: 'Signin to BileMo API'
+      description: 'Signin to BileMo API'
+      operationId: 'App\Controller\ResellerController::register'
+      requestBody:
+        description: 'enter your email and password of your choice'
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                email:
+                  description: 'enter your email as identifier, it must not be already taken'
+                  type: string
+                password:
+                  description: 'enter your chosen password, minimum 8 characters, one maj, one min, one number and one special character among #?!@$ %^&*-).'
+                  type: string
+              type: object
+              example:
+                email: exemple@mymail.com
+                password: mychosenpassword
+      responses:
+        '201':
+          description: 'successful operation'
+        '400':
+          description: 'input is not valid'
+  /api/auth/login:
+    post:
+      tags:
+        - 'login and signin'
+      summary: 'Login to BileMo API to get your token'
+      description: 'This can only be done by a signed in reseller, it will let you obtain a token.'
+      requestBody:
+        description: 'enter your credentials'
+        required: true
+        content:
+          application/json:
+            schema:
+              properties:
+                username:
+                  description: 'enter the email you registred with as identifier'
+                  type: string
+                password:
+                  description: 'enter your password'
+                  type: string
+              type: object
+              example:
+                username: exemple@mymail.com
+                password: mypassword
+      responses:
+        '200':
+          description: 'successful operation'
+        '400':
+          description: 'invalid credentials'
 components:
   schemas:
     Customer:
@@ -204,11 +282,13 @@ components:
       title: Reseller
       description: 'Reseller model'
       properties:
-        id:
-          title: ID
-          description: ID
-          format: int64
         email:
           title: Email
           description: 'reseller Email'
+          format: string
+        password:
+          title: Password
+          description: 'reseller password'
+          type: string
+          format: string
       type: object

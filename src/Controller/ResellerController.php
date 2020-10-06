@@ -92,6 +92,41 @@ class ResellerController extends AbstractController
 
     /**
      * @Route ("/api/auth/signin", name = "api_signin", methods = "POST")
+     * @OA\Post(
+     *      path="/api/auth/signin",
+     *      tags={"login and signin"},
+     *      summary="Signin to BileMo API",
+     *      description="Signin to BileMo API",
+     *      @OA\RequestBody(
+     *         description="enter your email and password of your choice",
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="email",
+     *                     description="enter your email as identifier, it must not be already taken",
+     *                     type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="password",
+     *                     description="enter your chosen password, minimum 8 characters, one maj, one min, one number and one special character among #?!@$ %^&*-).",
+     *                     type="string"
+     *                 ),
+     *                 example={"email": "exemple@mymail.com", "password": "mychosenpassword"}
+     *             ),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response="201",
+     *          description="successful operation",
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="input is not valid"
+     *      ),
+     * )
      */
     public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator)
     {
@@ -118,4 +153,42 @@ class ResellerController extends AbstractController
 
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
+
+    /**
+     * @OA\Post(
+     *      path="/api/auth/login",
+     *      tags={"login and signin"},
+     *      summary="Login to BileMo API to get your token",
+     *      description="This can only be done by a signed in reseller, it will let you obtain a token.",
+     *      @OA\RequestBody(
+     *         description="enter your credentials",
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="username",
+     *                     description="enter the email you registred with as identifier",
+     *                     type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="password",
+     *                     description="enter your password",
+     *                     type="string"
+     *                 ),
+     *                 example={"username": "exemple@mymail.com", "password": "mypassword"}
+     *             ),
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response="200",
+     *          description="successful operation",
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="invalid credentials"
+     *      ),
+     * )
+     */
 }

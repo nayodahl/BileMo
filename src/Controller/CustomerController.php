@@ -99,6 +99,32 @@ class CustomerController extends AbstractController
      *      tags={"customer"},
      *      summary="Creates a new customer",
      *      description="Creates a new customer linked to a logged reseller",
+     *      @OA\RequestBody(
+     *         description="Creates a new customer linked to a logged reseller",
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="firstname",
+     *                     description="enter the firstname of the customer",
+     *                     type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="lastname",
+     *                     description="enter the lastname of the customer",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="email",
+     *                     description="enter the email of the customer",
+     *                     type="string"
+     *                 ),
+     *                 example={"firstname": "Emily", "lastname": "Cooper", "email": "emily.cooper@mymail.com"}
+     *             ),
+     *          ),
+     *      ),
      *      @OA\Response(
      *          response="201",
      *          description="Create a new customer"

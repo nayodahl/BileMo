@@ -28,11 +28,6 @@ class Reseller implements UserInterface
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
      * @Groups({"show_resellers"})
-     * @OA\Property(
-     *     format="int64",
-     *     description="ID",
-     *     title="ID",
-     * )
      */
     private $id;
 
@@ -44,6 +39,7 @@ class Reseller implements UserInterface
      *     message = "The email '{{ value }}' is not a valid email."
      * )
      * @OA\Property(
+     *      format="string",
      *     description="reseller Email",
      *     title="Email",
      * )
@@ -55,6 +51,11 @@ class Reseller implements UserInterface
      * @ORM\Column(type="string")
      * @Assert\NotBlank
      * @UserAssert\IsValidPassword
+     * @OA\Property(
+     *      format="string",
+     *     description="reseller password",
+     *     title="Password",
+     * )
      */
     private $password;
 
