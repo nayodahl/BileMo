@@ -18,4 +18,31 @@ class CustomerRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Customer::class);
     }
+
+    /**
+     * Return all customers of a given Reseller.
+     */
+    public function findAllCustomersofOneReseller(int $resellerId)
+    {
+        return $this->createQueryBuilder('c')
+        ->innerJoin('c.reseller', 'cr')->addSelect('cr')
+        ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
+        ->getQuery()
+        ->getResult()
+        ;
+    }
+
+    /**
+     * Return single customer of a given Reseller, or null.
+     */
+    public function findOneCustomerofOneReseller(int $resellerId, int $customerId)
+    {
+        return $this->createQueryBuilder('c')
+        ->innerJoin('c.reseller', 'cr')->addSelect('cr')
+        ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
+        ->andWhere('c.id = :customerId')->setParameter('customerId', $customerId)
+        ->getQuery()
+        ->getOneOrNullResult()
+        ;
+    }
 }
