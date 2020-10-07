@@ -8,10 +8,17 @@ use App\Entity\Reseller;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
+use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 
 class AppFixtures extends Fixture
 {
     protected $faker;
+    private $passwordEncoder;
+
+    public function __construct(UserPasswordEncoderInterface $passwordEncoder)
+    {
+        $this->passwordEncoder = $passwordEncoder;
+    }
 
     public function load(ObjectManager $manager)
     {
@@ -74,11 +81,12 @@ class AppFixtures extends Fixture
         ->setInternalReference('IXR-A887ARBDEUR');
         $manager->persist($product);
 
-        // create 2 resellers
+        // create 1 reseller
         $reseller = new Reseller();
-        $reseller->setUsername('free')
-        ->setPassword('free')
-        ->setEmail($this->faker->companyEmail);
+        $reseller->setEmail($this->faker->companyEmail)
+        ->setPassword($this->passwordEncoder->encodePassword(
+            $reseller, '@dmIn123'
+        ));
         $manager->persist($reseller);
 
         // create 10 customers for this reseller
@@ -91,10 +99,12 @@ class AppFixtures extends Fixture
             $manager->persist($customer);
         }
 
+        // create 1 reseller
         $reseller = new Reseller();
-        $reseller->setUsername('ldlc')
-        ->setPassword('ldlc')
-        ->setEmail($this->faker->companyEmail);
+        $reseller->setEmail($this->faker->companyEmail)
+        ->setPassword($this->passwordEncoder->encodePassword(
+            $reseller, '@dmIn123'
+        ));
         $manager->persist($reseller);
 
         // create 10 customers for this reseller

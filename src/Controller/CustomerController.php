@@ -3,14 +3,13 @@
 namespace App\Controller;
 
 use App\Entity\Customer;
-use App\Entity\Reseller;
 use App\Repository\CustomerRepository;
-use App\Repository\ResellerRepository;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
 use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
 use Symfony\Component\Serializer\Serializer;
@@ -19,24 +18,14 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CustomerController extends AbstractController
 {
     /**
-     * Get the detail of a customer.
+     * Get the detail of a customer of a logged reseller.
      *
-     * @Route("/api/resellers/{resellerId}/customers/{customerId}", methods="GET", name="app_customer")
+     * @Route("/api/customers/{customerId}", methods="GET", name="app_customer")
      * @OA\Get(
-     *      path="/api/resellers/{resellerId}/customers/{customerId}",
+     *      path="/api/customers/{customerId}",
      *      tags={"customer"},
-     *      summary="Find customer by ID",
-     *      description="Returns a single customer",
-     *      @OA\Parameter(
-     *          name="resellerId",
-     *          in="path",
-     *          description="ID of reseller",
-     *          required=true,
-     *          @OA\Schema(
-     *              type="integer",
-     *              format="int"
-     *               )
-     *      ),
+     *      summary="Find customer by Id",
+     *      description="Returns a single customer detail, you need to be an authenticated reseller",
      *      @OA\Parameter(
      *          name="customerId",
      *          in="path",
@@ -62,9 +51,9 @@ class CustomerController extends AbstractController
      *     )
      * )
      */
-    public function showCustomer(int $customerId, CustomerRepository $customerRepo): JsonResponse
+    public function showCustomer(int $customerId, CustomerRepository $customerRepo, Security $security): JsonResponse
     {
-        $customer = $customerRepo->find($customerId);
+        $customer = $customerRepo->findOneCustomerofOneReseller($security->getUser()->getId(), $customerId);
         if (null !== $customer) {
             return $this->json($customer, 200, [], ['groups' => 'show_customers']);
         }
@@ -73,24 +62,14 @@ class CustomerController extends AbstractController
     }
 
     /**
-     * Get the list of all customers of a given reseller.
+     * Get the list of all customers of a logged reseller.
      *
-     * @Route("/api/resellers/{resellerId}/customers", methods="GET", name="app_customers")
+     * @Route("/api/customers/{page<\d+>?1}", methods="GET", name="app_customers")
      * @OA\Get(
-     *      path="/api/resellers/{resellerId}/customers",
+     *      path="/api/customers",
      *      tags={"customer"},
-     *      summary="Find all customers",
-     *      description="Returns a list of all customers of a given reseller",
-     *      @OA\Parameter(
-     *          name="resellerId",
-     *          in="path",
-     *          description="ID of reseller",
-     *          required=true,
-     *          @OA\Schema(
-     *              type="integer",
-     *              format="int"
-     *               )
-     *      ),
+     *      summary="Find all your customers",
+     *      description="Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/customers?page=2 ",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
@@ -101,9 +80,16 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function showCustomers(CustomerRepository $customerRepo): JsonResponse
+    public function showCustomers(CustomerRepository $customerRepo, Security $security, Request $request): JsonResponse
     {
-        $customers = $customerRepo->findAll();
+        // pagination info
+        $page = $request->query->get('page');
+        if ((null === $page) || $page < 1) {
+            $page = 1;
+        }
+
+        //get data
+        $customers = $customerRepo->findAllCustomersofOneReseller($security->getUser()->getId(), $page, $this->getParameter('pagination_limit'));
         if (null !== $customers) {
             return $this->json($customers, 200, [], ['groups' => 'show_customers']);
         }
@@ -114,25 +100,40 @@ class CustomerController extends AbstractController
     /**
      * Create a new customer.
      *
-     * @Route("/api/resellers/{resellerId}/customers", methods="POST", name="app_create_customer")
+     * @Route("/api/customers", methods="POST", name="app_create_customer")
      * @OA\Post(
-     *      path="/api/resellers/{resellerId}/customers",
+     *      path="/api/customers",
      *      tags={"customer"},
      *      summary="Creates a new customer",
-     *      description="Creates a new customer linked to a given reseller",
-     *      @OA\Parameter(
-     *          name="resellerId",
-     *          in="path",
-     *          description="ID of reseller",
-     *          required=true,
-     *          @OA\Schema(
-     *              type="integer",
-     *              format="int"
-     *               )
+     *      description="Creates a new customer linked to your account, you need to be an authenticated reseller",
+     *      @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="firstname",
+     *                     description="enter the firstname of the customer",
+     *                     type="string",
+     *                 ),
+     *                 @OA\Property(
+     *                     property="lastname",
+     *                     description="enter the lastname of the customer",
+     *                     type="string"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="email",
+     *                     description="enter the email of the customer",
+     *                     type="string"
+     *                 ),
+     *                 example={"firstname": "Emily", "lastname": "Cooper", "email": "emily.cooper@mymail.com"}
+     *             ),
+     *          ),
      *      ),
      *      @OA\Response(
      *          response="201",
-     *          description="Create a new customer"
+     *          description="customer created"
      *      ),
      *      @OA\Response(
      *         response=400,
@@ -140,10 +141,9 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function CreateCustomer(int $resellerId, ResellerRepository $resellerRepo, Request $request, ValidatorInterface $validator): JsonResponse
+    public function CreateCustomer(Request $request, ValidatorInterface $validator, Security $security): JsonResponse
     {
-        $reseller = new Reseller();
-        $reseller = $resellerRepo->find($resellerId);
+        $reseller = $security->getUser();
 
         $encoder = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
@@ -167,16 +167,16 @@ class CustomerController extends AbstractController
     /**
      * Delete a customer.
      *
-     * @Route("/api/resellers/{resellerId}/customers/{customerId}", methods="DELETE", name="app_delete_customer")
+     * @Route("/api/customers/{customerId}", methods="DELETE", name="app_delete_customer")
      * @OA\Delete(
-     *      path="/api/resellers/{resellerId}/customers/{customerId}",
+     *      path="/api/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Deletes a customer",
-     *      description="Delete a customer linked to a given reseller",
+     *      description="Delete a customer linked to your account, you need to be an authenticated reseller",
      *      @OA\Parameter(
      *         name="customerId",
      *         in="path",
-     *         description="Customer ID to delete",
+     *         description="Customer Id to delete",
      *         required=true,
      *         @OA\Schema(
      *             type="integer",
@@ -193,18 +193,24 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function DeleteCustomer(int $customerId, CustomerRepository $customerRepo): JsonResponse
+    public function DeleteCustomer(int $customerId, CustomerRepository $customerRepo, Security $security): JsonResponse
     {
+        $reseller = $security->getUser();
         $customer = $customerRepo->find($customerId);
 
-        if (null !== $customer) {
-            $em = $this->getDoctrine()->getManager();
-            $em->remove($customer);
-            $em->flush();
-
-            return $this->json(['message' => 'customer has been deleted'], 204);
+        if (null === $customer) {
+            return $this->json(['message' => 'customer does not exist'], 404);
         }
 
-        return $this->json(['message' => 'customer does not exist'], 404);
+        // check if the logged reseller is the one that owns the customer
+        if ($reseller !== $customer->getReseller()) {
+            return $this->json(['message' => 'you are not authorized to delete this customer'], 403);
+        }
+
+        $em = $this->getDoctrine()->getManager();
+        $em->remove($customer);
+        $em->flush();
+
+        return $this->json(['message' => 'customer has been deleted'], 204);
     }
 }

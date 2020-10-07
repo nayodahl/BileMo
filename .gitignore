@@ -18,3 +18,7 @@
 .vscode
 node_modules
 *.code-workspace
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###

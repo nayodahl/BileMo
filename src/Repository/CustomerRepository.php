@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Customer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -17,5 +18,35 @@ class CustomerRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Customer::class);
+    }
+
+    /**
+     * Return all customers of a given Reseller.
+     */
+    public function findAllCustomersofOneReseller(int $resellerId, int $page, int $limit): ?Paginator
+    {
+        $query = $this->createQueryBuilder('c')
+        ->innerJoin('c.reseller', 'cr')->addSelect('cr')
+        ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
+        ->getQuery()
+        ->setFirstResult(($page - 1) * $limit)
+        ->setMaxResults($limit)
+        ;
+
+        return new Paginator($query);
+    }
+
+    /**
+     * Return single customer of a given Reseller, or null.
+     */
+    public function findOneCustomerofOneReseller(int $resellerId, int $customerId): ?Customer
+    {
+        return $this->createQueryBuilder('c')
+        ->innerJoin('c.reseller', 'cr')->addSelect('cr')
+        ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
+        ->andWhere('c.id = :customerId')->setParameter('customerId', $customerId)
+        ->getQuery()
+        ->getOneOrNullResult()
+        ;
     }
 }
