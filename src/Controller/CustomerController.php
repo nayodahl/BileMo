@@ -64,12 +64,12 @@ class CustomerController extends AbstractController
     /**
      * Get the list of all customers of a logged reseller.
      *
-     * @Route("/api/customers", methods="GET", name="app_customers")
+     * @Route("/api/customers/{page<\d+>?1}", methods="GET", name="app_customers")
      * @OA\Get(
      *      path="/api/customers",
      *      tags={"customer"},
      *      summary="Find all your customers",
-     *      description="Returns the list of all your customers, you need to be an authenticated reseller",
+     *      description="Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/customers?page=2 ",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
@@ -80,9 +80,16 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function showCustomers(CustomerRepository $customerRepo, Security $security): JsonResponse
+    public function showCustomers(CustomerRepository $customerRepo, Security $security, Request $request): JsonResponse
     {
-        $customers = $customerRepo->findAllCustomersofOneReseller($security->getUser()->getId());
+        // pagination info
+        $page = $request->query->get('page');
+        if (is_null($page) || $page < 1) {
+            $page = 1;
+        }
+
+        //get data
+        $customers = $customerRepo->findAllCustomersofOneReseller($security->getUser()->getId(), $page, $this->getParameter('pagination_limit'));
         if (null !== $customers) {
             return $this->json($customers, 200, [], ['groups' => 'show_customers']);
         }

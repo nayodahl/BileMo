@@ -56,7 +56,7 @@ paths:
       tags:
         - customer
       summary: 'Find all your customers'
-      description: 'Returns the list of all your customers, you need to be an authenticated reseller'
+      description: 'Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/customers?page=2 '
       operationId: 'App\Controller\CustomerController::showCustomers'
       responses:
         '200':
@@ -126,7 +126,7 @@ paths:
       tags:
         - phone
       summary: 'Find all phones'
-      description: 'Returns a list of all phones, you need to be an authenticated reseller'
+      description: 'Returns a paginated list of all phones, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/phones?page=2 '
       operationId: 'App\Controller\PhoneController::showPhones'
       responses:
         '200':
@@ -165,7 +165,7 @@ paths:
       tags:
         - reseller
       summary: 'Find all resellers'
-      description: 'Returns a list of all resellers'
+      description: 'Returns a paginated list of all resellers, you need to be an authenticated admin. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/resellers?page=2 '
       operationId: 'App\Controller\ResellerController::showResellers'
       responses:
         '200':

@@ -69,7 +69,7 @@ class ResellerController extends AbstractController
      *      path="/api/resellers",
      *      tags={"reseller"},
      *      summary="Find all resellers",
-     *      description="Returns a list of all resellers",
+     *      description="Returns a paginated list of all resellers, you need to be an authenticated admin. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/resellers?page=2 ",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
@@ -80,9 +80,16 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function showResellers(ResellerRepository $resellerRepo): JsonResponse
+    public function showResellers(ResellerRepository $resellerRepo, Request $request): JsonResponse
     {
-        $resellers = $resellerRepo->findAll();
+        // pagination info
+        $page = $request->query->get('page');
+        if (is_null($page) || $page < 1) {
+            $page = 1;
+        }
+
+        // get data
+        $resellers = $resellerRepo->findAllResellers($page, $this->getParameter('pagination_limit'));
         if (null !== $resellers) {
             return $this->json($resellers, 200, [], ['groups' => 'show_resellers']);
         }
