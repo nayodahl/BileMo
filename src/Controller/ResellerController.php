@@ -84,7 +84,7 @@ class ResellerController extends AbstractController
     {
         // pagination info
         $page = $request->query->get('page');
-        if (is_null($page) || $page < 1) {
+        if ((null === $page) || $page < 1) {
             $page = 1;
         }
 
