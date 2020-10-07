@@ -17,12 +17,12 @@ class PhoneController extends AbstractController
      * @OA\Get(
      *      path="/api/phones/{phoneId}",
      *      tags={"phone"},
-     *      summary="Find phone by ID",
-     *      description="Returns a single phone",
+     *      summary="Find phone by Id",
+     *      description="Returns a single phone detail, you need to be an authenticated reseller",
      *      @OA\Parameter(
      *          name="phoneId",
      *          in="path",
-     *          description="ID of phone to return",
+     *          description="Id of phone to return",
      *          required=true,
      *          @OA\Schema(
      *              type="integer",
@@ -62,7 +62,7 @@ class PhoneController extends AbstractController
      *      path="/api/phones",
      *      tags={"phone"},
      *      summary="Find all phones",
-     *      description="Returns a list of all phones",
+     *      description="Returns a list of all phones, you need to be an authenticated reseller",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",

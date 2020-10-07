@@ -39,7 +39,6 @@ class Reseller implements UserInterface
      *     message = "The email '{{ value }}' is not a valid email."
      * )
      * @OA\Property(
-     *      format="string",
      *     description="reseller Email",
      *     title="Email",
      * )
@@ -52,7 +51,6 @@ class Reseller implements UserInterface
      * @Assert\NotBlank
      * @UserAssert\IsValidPassword
      * @OA\Property(
-     *      format="string",
      *     description="reseller password",
      *     title="Password",
      * )

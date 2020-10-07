@@ -8,8 +8,8 @@ paths:
     get:
       tags:
         - customer
-      summary: 'Find customer by ID'
-      description: 'Returns a single customer'
+      summary: 'Find customer by Id'
+      description: 'Returns a single customer detail, you need to be an authenticated reseller'
       operationId: 'App\Controller\CustomerController::showCustomer'
       parameters:
         -
@@ -35,13 +35,13 @@ paths:
       tags:
         - customer
       summary: 'Deletes a customer'
-      description: 'Delete a customer linked to a logged reseller'
+      description: 'Delete a customer linked to your account, you need to be an authenticated reseller'
       operationId: 'App\Controller\CustomerController::DeleteCustomer'
       parameters:
         -
           name: customerId
           in: path
-          description: 'Customer ID to delete'
+          description: 'Customer Id to delete'
           required: true
           schema:
             type: integer
@@ -56,7 +56,7 @@ paths:
       tags:
         - customer
       summary: 'Find all your customers'
-      description: 'Returns the list of all your customers'
+      description: 'Returns the list of all your customers, you need to be an authenticated reseller'
       operationId: 'App\Controller\CustomerController::showCustomers'
       responses:
         '200':
@@ -67,10 +67,9 @@ paths:
       tags:
         - customer
       summary: 'Creates a new customer'
-      description: 'Creates a new customer linked to a logged reseller'
+      description: 'Creates a new customer linked to your account, you need to be an authenticated reseller'
       operationId: 'App\Controller\CustomerController::CreateCustomer'
       requestBody:
-        description: 'Creates a new customer linked to a logged reseller'
         required: true
         content:
           application/json:
@@ -92,21 +91,21 @@ paths:
                 email: emily.cooper@mymail.com
       responses:
         '201':
-          description: 'Create a new customer'
+          description: 'customer created'
         '400':
           description: 'Invalid input'
   '/api/phones/{phoneId}':
     get:
       tags:
         - phone
-      summary: 'Find phone by ID'
-      description: 'Returns a single phone'
+      summary: 'Find phone by Id'
+      description: 'Returns a single phone detail, you need to be an authenticated reseller'
       operationId: 'App\Controller\PhoneController::showPhone'
       parameters:
         -
           name: phoneId
           in: path
-          description: 'ID of phone to return'
+          description: 'Id of phone to return'
           required: true
           schema:
             type: integer
@@ -127,7 +126,7 @@ paths:
       tags:
         - phone
       summary: 'Find all phones'
-      description: 'Returns a list of all phones'
+      description: 'Returns a list of all phones, you need to be an authenticated reseller'
       operationId: 'App\Controller\PhoneController::showPhones'
       responses:
         '200':
@@ -178,10 +177,10 @@ paths:
       tags:
         - 'login and signin'
       summary: 'Signin to BileMo API'
-      description: 'Signin to BileMo API'
+      description: 'Signin to BileMo API, to create your reseller account'
       operationId: 'App\Controller\ResellerController::register'
       requestBody:
-        description: 'enter your email and password of your choice'
+        description: 'Enter your email and the password of your choice. The password must respects following rules : minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).'
         required: true
         content:
           application/json:
@@ -191,7 +190,7 @@ paths:
                   description: 'enter your email as identifier, it must not be already taken'
                   type: string
                 password:
-                  description: 'enter your chosen password, minimum 8 characters, one maj, one min, one number and one special character among #?!@$ %^&*-).'
+                  description: 'enter your chosen password, minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).'
                   type: string
               type: object
               example:
@@ -206,8 +205,8 @@ paths:
     post:
       tags:
         - 'login and signin'
-      summary: 'Login to BileMo API to get your token'
-      description: 'This can only be done by a signed in reseller, it will let you obtain a token.'
+      summary: 'Login to BileMo API to get your authentication token (Bearer token)'
+      description: 'This can only be done by a registred reseller. It will let you obtain a token to make all others requests to the API that need authentication (almost all requests).'
       requestBody:
         description: 'enter your credentials'
         required: true
@@ -228,6 +227,14 @@ paths:
       responses:
         '200':
           description: 'successful operation'
+          content:
+            application/json:
+              schema:
+                properties:
+                  token: { description: 'your precious token', type: string }
+                type: object
+                example:
+                  token: eyJ7eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MDIwNTU3NjAsImV4cCI6MTYwMjA1OTM2MCwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiZGV2QGxkbGMuY29tIn0.SI5UDCNxGewjFJt86olg4DbmHx6Hl9E1UqGHAWhEXIiDJNWlKVq4_evwIuuk-EPoZV7BfEuAXU19_VFg1sGbEDhs20pzOC3G8pwKNZb_NTJ1E_tZ2Wq5GQpGw38uJa6qbYg4LoVs8EyMKrul-GQXA__Tm7blr9CU40PRrhMU4LdNf9wSitYFQ_9PJS0KpvjRfDgEMmt41QB-uUh2rUbNXcfUzfake5zeQQq_AoWMZBas3mUYdZe5np0jQvNHyuw2rit2OEIhVnZzHtMbVg6XACmYy9hHw--gQ7sjiSpqTq5ZeXW1b8AWTLQRiYMC3gLU89lvRHZs4GZLUZ4_c-4mxVNMBSf5J0yjHGW4buzVy5lx9rEY1tW9XeuYPKXKODisPNcX3p1j8XKwgEdjBC4LkhlDERFoADCYH75F5IURaMpj-HSs2U6fNcduQlm8NHd_y_ziywjj6a8qjvnIvUqWOMgYjSeesVBTZvWvNBiOqZ1yRdjGAmDw5KSPReTKPsq6IBHQersaZ_YMXwakVaTdJi7IZ-IhjJTIHuBxtlfYQLNyJWHQTTMfoJPto4FFwtNysKvus1v9RIKACoB9KZcYm2gN9dbKFZFenCWHm-pGeLWGzpKdI-2Km-egT7WX9X27BHHhhqx7RfKa7AWO9JR3G20vpbSBfx8YeVXWofesW2I
         '400':
           description: 'invalid credentials'
 components:
@@ -285,10 +292,8 @@ components:
         email:
           title: Email
           description: 'reseller Email'
-          format: string
         password:
           title: Password
           description: 'reseller password'
           type: string
-          format: string
       type: object

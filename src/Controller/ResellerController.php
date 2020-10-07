@@ -75,7 +75,7 @@ class ResellerController extends AbstractController
      *          description="successful operation",
      *      ),
      *      @OA\Response(
-     *          response=404,
+     *          response="404",
      *          description="there is no reseller for the moment"
      *      ),
      * )
@@ -96,9 +96,9 @@ class ResellerController extends AbstractController
      *      path="/api/auth/signin",
      *      tags={"login and signin"},
      *      summary="Signin to BileMo API",
-     *      description="Signin to BileMo API",
+     *      description="Signin to BileMo API, to create your reseller account",
      *      @OA\RequestBody(
-     *         description="enter your email and password of your choice",
+     *         description="Enter your email and the password of your choice. The password must respects following rules : minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).",
      *         required=true,
      *         @OA\MediaType(
      *             mediaType="application/json",
@@ -111,7 +111,7 @@ class ResellerController extends AbstractController
      *                 ),
      *                 @OA\Property(
      *                     property="password",
-     *                     description="enter your chosen password, minimum 8 characters, one maj, one min, one number and one special character among #?!@$ %^&*-).",
+     *                     description="enter your chosen password, minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).",
      *                     type="string"
      *                 ),
      *                 example={"email": "exemple@mymail.com", "password": "mychosenpassword"}
@@ -123,7 +123,7 @@ class ResellerController extends AbstractController
      *          description="successful operation",
      *      ),
      *      @OA\Response(
-     *          response=400,
+     *          response="400",
      *          description="input is not valid"
      *      ),
      * )
@@ -158,8 +158,8 @@ class ResellerController extends AbstractController
      * @OA\Post(
      *      path="/api/auth/login",
      *      tags={"login and signin"},
-     *      summary="Login to BileMo API to get your token",
-     *      description="This can only be done by a signed in reseller, it will let you obtain a token.",
+     *      summary="Login to BileMo API to get your authentication token (Bearer token)",
+     *      description="This can only be done by a registred reseller. It will let you obtain a token to make all others requests to the API that need authentication (almost all requests).",
      *      @OA\RequestBody(
      *         description="enter your credentials",
      *         required=true,
@@ -184,9 +184,21 @@ class ResellerController extends AbstractController
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
+     *          @OA\MediaType(
+     *             mediaType="application/json",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="token",
+     *                     description="your precious token",
+     *                     type="string",
+     *                 ),
+     *                 example={"token": "eyJ7eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MDIwNTU3NjAsImV4cCI6MTYwMjA1OTM2MCwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiZGV2QGxkbGMuY29tIn0.SI5UDCNxGewjFJt86olg4DbmHx6Hl9E1UqGHAWhEXIiDJNWlKVq4_evwIuuk-EPoZV7BfEuAXU19_VFg1sGbEDhs20pzOC3G8pwKNZb_NTJ1E_tZ2Wq5GQpGw38uJa6qbYg4LoVs8EyMKrul-GQXA__Tm7blr9CU40PRrhMU4LdNf9wSitYFQ_9PJS0KpvjRfDgEMmt41QB-uUh2rUbNXcfUzfake5zeQQq_AoWMZBas3mUYdZe5np0jQvNHyuw2rit2OEIhVnZzHtMbVg6XACmYy9hHw--gQ7sjiSpqTq5ZeXW1b8AWTLQRiYMC3gLU89lvRHZs4GZLUZ4_c-4mxVNMBSf5J0yjHGW4buzVy5lx9rEY1tW9XeuYPKXKODisPNcX3p1j8XKwgEdjBC4LkhlDERFoADCYH75F5IURaMpj-HSs2U6fNcduQlm8NHd_y_ziywjj6a8qjvnIvUqWOMgYjSeesVBTZvWvNBiOqZ1yRdjGAmDw5KSPReTKPsq6IBHQersaZ_YMXwakVaTdJi7IZ-IhjJTIHuBxtlfYQLNyJWHQTTMfoJPto4FFwtNysKvus1v9RIKACoB9KZcYm2gN9dbKFZFenCWHm-pGeLWGzpKdI-2Km-egT7WX9X27BHHhhqx7RfKa7AWO9JR3G20vpbSBfx8YeVXWofesW2I"}
+     *             ),
+     *          ),
      *      ),
      *      @OA\Response(
-     *          response=400,
+     *          response="400",
      *          description="invalid credentials"
      *      ),
      * )

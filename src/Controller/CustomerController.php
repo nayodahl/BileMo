@@ -24,8 +24,8 @@ class CustomerController extends AbstractController
      * @OA\Get(
      *      path="/api/customers/{customerId}",
      *      tags={"customer"},
-     *      summary="Find customer by ID",
-     *      description="Returns a single customer",
+     *      summary="Find customer by Id",
+     *      description="Returns a single customer detail, you need to be an authenticated reseller",
      *      @OA\Parameter(
      *          name="customerId",
      *          in="path",
@@ -69,7 +69,7 @@ class CustomerController extends AbstractController
      *      path="/api/customers",
      *      tags={"customer"},
      *      summary="Find all your customers",
-     *      description="Returns the list of all your customers",
+     *      description="Returns the list of all your customers, you need to be an authenticated reseller",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
@@ -98,9 +98,8 @@ class CustomerController extends AbstractController
      *      path="/api/customers",
      *      tags={"customer"},
      *      summary="Creates a new customer",
-     *      description="Creates a new customer linked to a logged reseller",
+     *      description="Creates a new customer linked to your account, you need to be an authenticated reseller",
      *      @OA\RequestBody(
-     *         description="Creates a new customer linked to a logged reseller",
      *         required=true,
      *         @OA\MediaType(
      *             mediaType="application/json",
@@ -127,7 +126,7 @@ class CustomerController extends AbstractController
      *      ),
      *      @OA\Response(
      *          response="201",
-     *          description="Create a new customer"
+     *          description="customer created"
      *      ),
      *      @OA\Response(
      *         response=400,
@@ -166,11 +165,11 @@ class CustomerController extends AbstractController
      *      path="/api/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Deletes a customer",
-     *      description="Delete a customer linked to a logged reseller",
+     *      description="Delete a customer linked to your account, you need to be an authenticated reseller",
      *      @OA\Parameter(
      *         name="customerId",
      *         in="path",
-     *         description="Customer ID to delete",
+     *         description="Customer Id to delete",
      *         required=true,
      *         @OA\Schema(
      *             type="integer",
