@@ -4,10 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Reseller;
 use App\Repository\ResellerRepository;
+use JMS\Serializer\SerializerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Serializer\Encoder\JsonEncoder;
@@ -51,11 +54,13 @@ class ResellerController extends AbstractController
      *     )
      * )
      */
-    public function showReseller(int $resellerId, ResellerRepository $resellerRepo): JsonResponse
+    public function showReseller(int $resellerId, ResellerRepository $resellerRepo, SerializerInterface $serializer): Response
     {
         $reseller = $resellerRepo->find($resellerId);
         if (null !== $reseller) {
-            return $this->json($reseller, 200, [], ['groups' => 'show_resellers']);
+            $json = $serializer->serialize($reseller, 'json');
+
+            return new Response($json, 200, ['Content-Type' => 'application/json']);
         }
 
         return $this->json(['message' => 'this reseller does not exist'], 404);
@@ -80,18 +85,22 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function showResellers(ResellerRepository $resellerRepo, Request $request): JsonResponse
+    public function showResellers(ResellerRepository $resellerRepo, Request $request, SerializerInterface $serializer, PaginatorInterface $paginator): Response
     {
-        // pagination info
-        $page = $request->query->get('page');
-        if ((null === $page) || $page < 1) {
-            $page = 1;
-        }
-
         // get data
-        $resellers = $resellerRepo->findAllResellers($page, $this->getParameter('pagination_limit'));
+        $resellers = $resellerRepo->findAll();
+
+        // pagination
+        $paginated = $paginator->paginate(
+            $resellers,
+            $request->query->getInt('page', 1), /*page number*/
+            $this->getParameter('pagination_limit') /*limit per page*/
+        );
+
         if (null !== $resellers) {
-            return $this->json($resellers, 200, [], ['groups' => 'show_resellers']);
+            $json = $serializer->serialize($paginated, 'json');
+
+            return new Response($json, 200, ['Content-Type' => 'application/json']);
         }
 
         return $this->json(['message' => 'there is no reseller for the moment'], 404);
@@ -135,7 +144,7 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator)
+    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator): JsonResponse
     {
         $encoder = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
@@ -161,7 +170,7 @@ class ResellerController extends AbstractController
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 
-    /**
+    /*
      * @OA\Post(
      *      path="/api/auth/login",
      *      tags={"login and signin"},

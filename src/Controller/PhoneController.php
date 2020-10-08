@@ -3,10 +3,12 @@
 namespace App\Controller;
 
 use App\Repository\PhoneRepository;
+use JMS\Serializer\SerializerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class PhoneController extends AbstractController
@@ -45,11 +47,13 @@ class PhoneController extends AbstractController
      *     )
      * )
      */
-    public function showPhone(int $phoneId, PhoneRepository $phoneRepo): JsonResponse
+    public function showPhone(int $phoneId, PhoneRepository $phoneRepo, SerializerInterface $serializer): Response
     {
         $phone = $phoneRepo->find($phoneId);
         if (null !== $phone) {
-            return  $this->json($phone, 200);
+            $json = $serializer->serialize($phone, 'json');
+
+            return new Response($json, 200, ['Content-Type' => 'application/json']);
         }
 
         return $this->json(['message' => 'Phone not found'], 404);
@@ -74,17 +78,22 @@ class PhoneController extends AbstractController
      *      ),
      * )
      */
-    public function showPhones(PhoneRepository $phoneRepo, Request $request): JsonResponse
+    public function showPhones(PhoneRepository $phoneRepo, Request $request, SerializerInterface $serializer, PaginatorInterface $paginator): Response
     {
-        // pagination info
-        $page = $request->query->get('page');
-        if ((null === $page) || $page < 1) {
-            $page = 1;
-        }
         // get data
-        $phones = $phoneRepo->findAllPhones($page, $this->getParameter('pagination_limit'));
+        $phones = $phoneRepo->findAll();
+
+        // pagination
+        $paginated = $paginator->paginate(
+            $phones,
+            $request->query->getInt('page', 1), /*page number*/
+            $this->getParameter('pagination_limit') /*limit per page*/
+        );
+
         if (null !== $phones) {
-            return  $this->json($phones, 200);
+            $json = $serializer->serialize($paginated, 'json');
+
+            return new Response($json, 200, ['Content-Type' => 'application/json']);
         }
 
         return $this->json(['message' => 'there is no phone for the moment'], 404);

@@ -4,15 +4,16 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
+use JMS\Serializer\SerializationContext;
+use JMS\Serializer\SerializerInterface;
+use Knp\Component\Pager\PaginatorInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Security;
-use Symfony\Component\Serializer\Encoder\JsonEncoder;
-use Symfony\Component\Serializer\Normalizer\ObjectNormalizer;
-use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CustomerController extends AbstractController
@@ -51,11 +52,13 @@ class CustomerController extends AbstractController
      *     )
      * )
      */
-    public function showCustomer(int $customerId, CustomerRepository $customerRepo, Security $security): JsonResponse
+    public function showCustomer(int $customerId, CustomerRepository $customerRepo, Security $security, SerializerInterface $serializer): Response
     {
         $customer = $customerRepo->findOneCustomerofOneReseller($security->getUser()->getId(), $customerId);
         if (null !== $customer) {
-            return $this->json($customer, 200, [], ['groups' => 'show_customers']);
+            $json = $serializer->serialize($customer, 'json', SerializationContext::create()->enableMaxDepthChecks());
+
+            return new Response($json, 200, ['Content-Type' => 'application/json']);
         }
 
         return $this->json(['message' => 'this customer does not exist'], 404);
@@ -80,18 +83,22 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function showCustomers(CustomerRepository $customerRepo, Security $security, Request $request): JsonResponse
+    public function showCustomers(CustomerRepository $customerRepo, Security $security, Request $request, SerializerInterface $serializer, PaginatorInterface $paginator): Response
     {
-        // pagination info
-        $page = $request->query->get('page');
-        if ((null === $page) || $page < 1) {
-            $page = 1;
-        }
-
         //get data
-        $customers = $customerRepo->findAllCustomersofOneReseller($security->getUser()->getId(), $page, $this->getParameter('pagination_limit'));
+        $customers = $customerRepo->findAllCustomersofOneReseller($security->getUser()->getId());
+
+        // pagination
+        $paginated = $paginator->paginate(
+            $customers,
+            $request->query->getInt('page', 1), /*page number*/
+            $this->getParameter('pagination_limit') /*limit per page*/
+        );
+
         if (null !== $customers) {
-            return $this->json($customers, 200, [], ['groups' => 'show_customers']);
+            $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->enableMaxDepthChecks());
+
+            return new Response($json, 200, ['Content-Type' => 'application/json']);
         }
 
         return $this->json(['message' => 'there is no customer for the moment'], 404);
@@ -141,13 +148,9 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function CreateCustomer(Request $request, ValidatorInterface $validator, Security $security): JsonResponse
+    public function CreateCustomer(Request $request, ValidatorInterface $validator, Security $security, SerializerInterface $serializer): JsonResponse
     {
         $reseller = $security->getUser();
-
-        $encoder = [new JsonEncoder()];
-        $normalizers = [new ObjectNormalizer()];
-        $serializer = new Serializer($normalizers, $encoder);
 
         $customer = $serializer->deserialize($request->getContent(), Customer::class, 'json');
         $customer->setReseller($reseller);

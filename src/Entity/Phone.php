@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\PhoneRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
 use OpenApi\Annotations as OA;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
@@ -14,6 +16,15 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
  *     description="Phone model",
  *     title="Phone",
  * )
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "app_phone",
+ *          parameters = { "phoneId" = "expr(object.getId())" },
+ *          absolute = true,
+ *      )
+ * )
+ * @Serializer\XmlRoot("phone")
  */
 class Phone
 {
@@ -26,6 +37,7 @@ class Phone
      *     description="ID",
      *     title="ID",
      * )
+     * @Serializer\XmlAttribute
      */
     private $id;
 

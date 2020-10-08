@@ -5,9 +5,12 @@ namespace App\Entity;
 use App\Repository\CustomerRepository;
 use App\Validator as UserAssert;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
 use OpenApi\Annotations as OA;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -17,6 +20,23 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      description="Customer model",
  *      title="Customer",
  * )
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "app_customer",
+ *          parameters = { "customerId" = "expr(object.getId())" },
+ *          absolute = true,
+ *      )
+ * )
+ * @Hateoas\Relation(
+ *      "delete",
+ *      href = @Hateoas\Route(
+ *          "app_delete_customer",
+ *          parameters = { "customerId" = "expr(object.getId())" },
+ *          absolute = true
+ *      )
+ * )
+ * @Serializer\XmlRoot("customer")
  */
 class Customer
 {
@@ -30,6 +50,7 @@ class Customer
      *     description="ID",
      *     title="ID",
      * )
+     * @Serializer\XmlAttribute
      */
     private $id;
 
@@ -78,6 +99,7 @@ class Customer
      *     description="customer parent Reseller",
      *     title="Reseller",
      * )
+     * @MaxDepth(1)
      */
     private $reseller;
 

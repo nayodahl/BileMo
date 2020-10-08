@@ -7,10 +7,14 @@ use App\Validator as UserAssert;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Exclude;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
 use OpenApi\Annotations as OA;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -20,6 +24,15 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      description="Reseller model",
  *      title="Reseller",
  * )
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "app_reseller",
+ *          parameters = { "resellerId" = "expr(object.getId())" },
+ *          absolute = true,
+ *      )
+ * )
+ * @Serializer\XmlRoot("reseller")
  */
 class Reseller implements UserInterface
 {
@@ -27,13 +40,14 @@ class Reseller implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
-     * @Groups({"show_resellers"})
+     * @Groups({"detail"})
+     * @Serializer\XmlAttribute
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255, unique=true)
-     * @Groups({"show_resellers"})
+     * @Groups({"detail"})
      * @Assert\NotBlank
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
@@ -54,17 +68,19 @@ class Reseller implements UserInterface
      *     description="reseller password",
      *     title="Password",
      * )
+     * @Exclude
      */
     private $password;
 
     /**
      * @ORM\Column(type="json")
+     * @Exclude
      */
     private $roles = [];
 
     /**
      * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="reseller", orphanRemoval=true)
-     * @Groups({"show_resellers"})
+     * @MaxDepth(1)
      */
     private $customer;
 

@@ -36,18 +36,4 @@ class ResellerRepository extends ServiceEntityRepository implements PasswordUpgr
         $this->_em->persist($user);
         $this->_em->flush();
     }
-
-    /**
-     * get all resellers account, with pagination.
-     */
-    public function findAllResellers(int $page, int $limit): ?Paginator
-    {
-        $query = $this->createQueryBuilder('r')
-        ->getQuery()
-        ->setFirstResult(($page - 1) * $limit)
-        ->setMaxResults($limit)
-        ;
-
-        return new Paginator($query);
-    }
 }
