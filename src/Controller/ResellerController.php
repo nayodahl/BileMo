@@ -56,6 +56,10 @@ class ResellerController extends AbstractController
      */
     public function showReseller(int $resellerId, ResellerRepository $resellerRepo, SerializerInterface $serializer): Response
     {
+        if ($this->isGranted('ROLE_ADMIN') === false){
+            return $this->json(['message' => 'you must be an admin to access this'], 403);
+        }
+
         $reseller = $resellerRepo->find($resellerId);
         if (null !== $reseller) {
             $json = $serializer->serialize($reseller, 'json');
@@ -87,6 +91,10 @@ class ResellerController extends AbstractController
      */
     public function showResellers(ResellerRepository $resellerRepo, Request $request, SerializerInterface $serializer, PaginatorInterface $paginator): Response
     {
+        if ($this->isGranted('ROLE_ADMIN') === false){
+            return $this->json(['message' => 'you must be an admin to access this'], 403);
+        }
+        
         // get data
         $resellers = $resellerRepo->findAll();
 
