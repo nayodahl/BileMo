@@ -16,9 +16,9 @@ class PhoneController extends AbstractController
     /**
      * Get the detail of a phone.
      *
-     * @Route("/api/phones/{phoneId}", methods="GET", name="app_phone")
+     * @Route("/api/v1/phones/{phoneId}", methods="GET", name="app_phone")
      * @OA\Get(
-     *      path="/api/phones/{phoneId}",
+     *      path="/api/v1/phones/{phoneId}",
      *      tags={"phone"},
      *      summary="Find phone by Id",
      *      description="Returns a single phone detail, you need to be an authenticated reseller",
@@ -62,12 +62,12 @@ class PhoneController extends AbstractController
     /**
      * Get a list of all phones.
      *
-     * @Route("/api/phones/{page<\d+>?1}", methods="GET", name="app_phones")
+     * @Route("/api/v1/phones/{page<\d+>?1}", methods="GET", name="app_phones")
      * @OA\Get(
-     *      path="/api/phones",
+     *      path="/api/v1/phones",
      *      tags={"phone"},
      *      summary="Find all phones",
-     *      description="Returns a paginated list of all phones, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/phones?page=2 ",
+     *      description="Returns a paginated list of all phones, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/phones?page=2 ",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",

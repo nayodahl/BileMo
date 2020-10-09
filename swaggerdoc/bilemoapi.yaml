@@ -4,7 +4,7 @@ info:
   description: 'This is the documention for Bilemo API.'
   version: 1.0.0
 paths:
-  '/api/customers/{customerId}':
+  '/api/v1/customers/{customerId}':
     get:
       tags:
         - customer
@@ -51,12 +51,12 @@ paths:
           description: 'Delete a customer'
         '404':
           description: 'Customer not found'
-  /api/customers:
+  /api/v1/customers:
     get:
       tags:
         - customer
       summary: 'Find all your customers'
-      description: 'Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/customers?page=2 '
+      description: 'Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/customers?page=2 '
       operationId: 'App\Controller\CustomerController::showCustomers'
       responses:
         '200':
@@ -94,7 +94,7 @@ paths:
           description: 'customer created'
         '400':
           description: 'Invalid input'
-  '/api/phones/{phoneId}':
+  '/api/v1/phones/{phoneId}':
     get:
       tags:
         - phone
@@ -121,19 +121,19 @@ paths:
           description: 'Phone not found'
         '400':
           description: 'Invalid ID supplier'
-  /api/phones:
+  /api/v1/phones:
     get:
       tags:
         - phone
       summary: 'Find all phones'
-      description: 'Returns a paginated list of all phones, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/phones?page=2 '
+      description: 'Returns a paginated list of all phones, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/phones?page=2 '
       operationId: 'App\Controller\PhoneController::showPhones'
       responses:
         '200':
           description: 'successful operation'
         '404':
           description: 'there is no phone for the moment'
-  '/api/resellers/{resellerId}':
+  '/api/v1/resellers/{resellerId}':
     get:
       tags:
         - reseller
@@ -160,19 +160,19 @@ paths:
           description: 'Reseller not found'
         '400':
           description: 'Invalid ID supplier'
-  /api/resellers:
+  /api/v1/resellers:
     get:
       tags:
         - reseller
       summary: 'Find all resellers'
-      description: 'Returns a paginated list of all resellers, you need to be an authenticated admin. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/resellers?page=2 '
+      description: 'Returns a paginated list of all resellers, you need to be an authenticated admin. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/resellers?page=2 '
       operationId: 'App\Controller\ResellerController::showResellers'
       responses:
         '200':
           description: 'successful operation'
         '404':
           description: 'there is no reseller for the moment'
-  /api/auth/signin:
+  /api/v1/auth/signin:
     post:
       tags:
         - 'login and signin'
@@ -201,7 +201,7 @@ paths:
           description: 'successful operation'
         '400':
           description: 'input is not valid'
-  /api/auth/login:
+  /api/v1/auth/login:
     post:
       tags:
         - 'login and signin'

@@ -23,9 +23,9 @@ class ResellerController extends AbstractController
     /**
      * Get the detail of a reseller.
      *
-     * @Route("/api/resellers/{resellerId}", methods="GET", name="app_reseller")
+     * @Route("/api/v1/resellers/{resellerId}", methods="GET", name="app_reseller")
      * @OA\Get(
-     *      path="/api/resellers/{resellerId}",
+     *      path="/api/v1/resellers/{resellerId}",
      *      tags={"reseller"},
      *      summary="Find reseller by ID",
      *      description="Returns a single reseller",
@@ -69,12 +69,12 @@ class ResellerController extends AbstractController
     /**
      * Get the list of all resellers.
      *
-     * @Route("/api/resellers", methods="GET", name="app_resellers")
+     * @Route("/api/v1/resellers", methods="GET", name="app_resellers")
      * @OA\Get(
-     *      path="/api/resellers",
+     *      path="/api/v1/resellers",
      *      tags={"reseller"},
      *      summary="Find all resellers",
-     *      description="Returns a paginated list of all resellers, you need to be an authenticated admin. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/resellers?page=2 ",
+     *      description="Returns a paginated list of all resellers, you need to be an authenticated admin. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/resellers?page=2 ",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
@@ -107,9 +107,9 @@ class ResellerController extends AbstractController
     }
 
     /**
-     * @Route ("/api/auth/signin", name = "api_signin", methods = "POST")
+     * @Route ("/api/v1/auth/signin", name = "api_signin", methods = "POST")
      * @OA\Post(
-     *      path="/api/auth/signin",
+     *      path="/api/v1/auth/signin",
      *      tags={"login and signin"},
      *      summary="Signin to BileMo API",
      *      description="Signin to BileMo API, to create your reseller account",
@@ -170,9 +170,9 @@ class ResellerController extends AbstractController
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 
-    /*
+    /**
      * @OA\Post(
-     *      path="/api/auth/login",
+     *      path="/api/v1/auth/login",
      *      tags={"login and signin"},
      *      summary="Login to BileMo API to get your authentication token (Bearer token)",
      *      description="This can only be done by a registred reseller. It will let you obtain a token to make all others requests to the API that need authentication (almost all requests).",
@@ -218,5 +218,5 @@ class ResellerController extends AbstractController
      *          description="invalid credentials"
      *      ),
      * )
-     */
+     **/
 }

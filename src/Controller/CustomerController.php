@@ -21,9 +21,9 @@ class CustomerController extends AbstractController
     /**
      * Get the detail of a customer of a logged reseller.
      *
-     * @Route("/api/customers/{customerId}", methods="GET", name="app_customer")
+     * @Route("/api/v1/customers/{customerId}", methods="GET", name="app_customer")
      * @OA\Get(
-     *      path="/api/customers/{customerId}",
+     *      path="/api/v1/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Find customer by Id",
      *      description="Returns a single customer detail, you need to be an authenticated reseller",
@@ -61,18 +61,18 @@ class CustomerController extends AbstractController
             return new Response($json, 200, ['Content-Type' => 'application/json']);
         }
 
-        return $this->json(['message' => 'this customer does not exist'], 404);
+        return $this->json(['message' => 'this customer does not exist, or is not yours'], 404);
     }
 
     /**
      * Get the list of all customers of a logged reseller.
      *
-     * @Route("/api/customers/{page<\d+>?1}", methods="GET", name="app_customers")
+     * @Route("/api/v1/customers/{page<\d+>?1}", methods="GET", name="app_customers")
      * @OA\Get(
-     *      path="/api/customers",
+     *      path="/api/v1/customers",
      *      tags={"customer"},
      *      summary="Find all your customers",
-     *      description="Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/customers?page=2 ",
+     *      description="Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/customers?page=2 ",
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
@@ -107,9 +107,9 @@ class CustomerController extends AbstractController
     /**
      * Create a new customer.
      *
-     * @Route("/api/customers", methods="POST", name="app_create_customer")
+     * @Route("/api/v1/customers", methods="POST", name="app_create_customer")
      * @OA\Post(
-     *      path="/api/customers",
+     *      path="/api/v1/customers",
      *      tags={"customer"},
      *      summary="Creates a new customer",
      *      description="Creates a new customer linked to your account, you need to be an authenticated reseller",
@@ -170,9 +170,9 @@ class CustomerController extends AbstractController
     /**
      * Delete a customer.
      *
-     * @Route("/api/customers/{customerId}", methods="DELETE", name="app_delete_customer")
+     * @Route("/api/v1/customers/{customerId}", methods="DELETE", name="app_delete_customer")
      * @OA\Delete(
-     *      path="/api/customers/{customerId}",
+     *      path="/api/v1/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Deletes a customer",
      *      description="Delete a customer linked to your account, you need to be an authenticated reseller",

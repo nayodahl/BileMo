@@ -19,7 +19,7 @@ class DocumentationController extends AbstractController
      * Default route used to show documention.
      *
      * @Route("/", name="app_default")
-     * @Route("/api/doc", name="app_documentation")
+     * @Route("/api/v1/doc", name="app_documentation")
      */
     public function showDocumentation()
     {
