@@ -148,7 +148,7 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function CreateCustomer(Request $request, ValidatorInterface $validator, Security $security, SerializerInterface $serializer): JsonResponse
+    public function CreateCustomer(CustomerRepository $customerRepo, Request $request, ValidatorInterface $validator, Security $security, SerializerInterface $serializer): JsonResponse
     {
         $reseller = $security->getUser();
 
@@ -158,6 +158,11 @@ class CustomerController extends AbstractController
         $errors = $validator->validate($customer);
         if (count($errors) > 0) {
             return $this->json(['message' => $errors], 400);
+        }
+
+        // check if customer already exists and linked to this reseller
+        if ($customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail()) !== null){
+            return $this->json(['message' => 'this customer already exists'], 400);
         }
 
         $em = $this->getDoctrine()->getManager();

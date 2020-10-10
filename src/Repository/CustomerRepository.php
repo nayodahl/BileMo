@@ -44,4 +44,18 @@ class CustomerRepository extends ServiceEntityRepository
         ->getOneOrNullResult()
         ;
     }
+
+    /**
+     * Return single customer of a given Reseller with a given email, or null.
+     */
+    public function findOneByEmailandReseller(int $resellerId, string $customerEmail): ?Customer
+    {
+        return $this->createQueryBuilder('c')
+        ->innerJoin('c.reseller', 'cr')->addSelect('cr')
+        ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
+        ->andWhere('c.email = :customerEmail')->setParameter('customerEmail', $customerEmail)
+        ->getQuery()
+        ->getOneOrNullResult()
+        ;
+    }
 }

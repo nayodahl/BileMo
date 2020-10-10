@@ -10,12 +10,10 @@ use JMS\Serializer\Annotation as Serializer;
 use JMS\Serializer\Annotation\Groups;
 use JMS\Serializer\Annotation\MaxDepth;
 use OpenApi\Annotations as OA;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
- * @UniqueEntity("email")
  * @OA\Schema(
  *      description="Customer model",
  *      title="Customer",
@@ -79,7 +77,7 @@ class Customer
     private $lastname;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers", "show_customers"})
      * @Assert\NotBlank
      * @Assert\Email(
