@@ -58,7 +58,16 @@ class CustomerController extends AbstractController
         if (null !== $customer) {
             $json = $serializer->serialize($customer, 'json', SerializationContext::create()->enableMaxDepthChecks());
 
-            return new Response($json, 200, ['Content-Type' => 'application/json']);
+            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
+
+            // cache publicly for 3600 seconds
+            $response->setPublic();
+            $response->setMaxAge($this->getParameter('cache_duration'));
+
+            // (optional) set a custom Cache-Control directive
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+
+            return $response;
         }
 
         return $this->json(['message' => 'this customer does not exist, or is not yours'], 404);
@@ -98,7 +107,16 @@ class CustomerController extends AbstractController
         if (null !== $customers) {
             $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->enableMaxDepthChecks());
 
-            return new Response($json, 200, ['Content-Type' => 'application/json']);
+            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
+
+            // cache publicly for 3600 seconds
+            $response->setPublic();
+            $response->setMaxAge($this->getParameter('cache_duration'));
+
+            // (optional) set a custom Cache-Control directive
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+
+            return $response;
         }
 
         return $this->json(['message' => 'there is no customer for the moment'], 404);
@@ -160,7 +178,8 @@ class CustomerController extends AbstractController
             return $this->json(['message' => $errors], 400);
         }
 
-        // check if customer already exists and linked to this reseller
+        // check if customer already exists and linked to this reseller.
+        // a customer email must be unique but only to one reseller, a customer can be registred to more than one reseller.
         if ($customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail()) !== null){
             return $this->json(['message' => 'this customer already exists'], 400);
         }

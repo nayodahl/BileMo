@@ -53,7 +53,16 @@ class PhoneController extends AbstractController
         if (null !== $phone) {
             $json = $serializer->serialize($phone, 'json');
 
-            return new Response($json, 200, ['Content-Type' => 'application/json']);
+            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
+
+            // cache publicly for 3600 seconds
+            $response->setPublic();
+            $response->setMaxAge($this->getParameter('cache_duration'));
+
+            // (optional) set a custom Cache-Control directive
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+
+            return $response;
         }
 
         return $this->json(['message' => 'Phone not found'], 404);
@@ -93,7 +102,16 @@ class PhoneController extends AbstractController
         if (null !== $phones) {
             $json = $serializer->serialize($paginated, 'json');
 
-            return new Response($json, 200, ['Content-Type' => 'application/json']);
+            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
+
+            // cache publicly for 3600 seconds
+            $response->setPublic();
+            $response->setMaxAge($this->getParameter('cache_duration'));
+
+            // (optional) set a custom Cache-Control directive
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+
+            return $response;
         }
 
         return $this->json(['message' => 'there is no phone for the moment'], 404);

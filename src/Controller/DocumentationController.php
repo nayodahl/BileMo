@@ -23,6 +23,15 @@ class DocumentationController extends AbstractController
      */
     public function showDocumentation()
     {
-        return $this->render('base.html.twig');
+        $response = $this->render('base.html.twig');
+
+        // cache publicly for 3600 seconds
+        $response->setPublic();
+        $response->setMaxAge($this->getParameter('cache_duration'));
+
+        // (optional) set a custom Cache-Control directive
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+
+        return $response;
     }
 }

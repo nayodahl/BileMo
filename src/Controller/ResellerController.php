@@ -64,7 +64,16 @@ class ResellerController extends AbstractController
         if (null !== $reseller) {
             $json = $serializer->serialize($reseller, 'json');
 
-            return new Response($json, 200, ['Content-Type' => 'application/json']);
+            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
+
+            // cache publicly for 3600 seconds
+            $response->setPublic();
+            $response->setMaxAge($this->getParameter('cache_duration'));
+
+            // (optional) set a custom Cache-Control directive
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+
+            return $response;
         }
 
         return $this->json(['message' => 'this reseller does not exist'], 404);
@@ -107,8 +116,17 @@ class ResellerController extends AbstractController
 
         if (null !== $resellers) {
             $json = $serializer->serialize($paginated, 'json');
+            
+            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
-            return new Response($json, 200, ['Content-Type' => 'application/json']);
+            // cache publicly for 3600 seconds
+            $response->setPublic();
+            $response->setMaxAge($this->getParameter('cache_duration'));
+
+            // (optional) set a custom Cache-Control directive
+            $response->headers->addCacheControlDirective('must-revalidate', true);
+
+            return $response;
         }
 
         return $this->json(['message' => 'there is no reseller for the moment'], 404);
