@@ -27,6 +27,13 @@ use Symfony\Component\Validator\Constraints as Assert;
  *      )
  * )
  * @Hateoas\Relation(
+ *      "create",
+ *      href = @Hateoas\Route(
+ *          "app_create_customer",
+ *          absolute = true,
+ *      )
+ * )
+ * @Hateoas\Relation(
  *      "delete",
  *      href = @Hateoas\Route(
  *          "app_delete_customer",
