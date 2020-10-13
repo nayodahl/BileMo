@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Phone;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator as Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**

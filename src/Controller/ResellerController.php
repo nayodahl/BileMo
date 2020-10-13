@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Reseller;
 use App\Repository\ResellerRepository;
+use App\Service\Paginator;
 use JMS\Serializer\SerializerInterface;
-use Knp\Component\Pager\PaginatorInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -56,7 +56,7 @@ class ResellerController extends AbstractController
      */
     public function showReseller(int $resellerId, ResellerRepository $resellerRepo, SerializerInterface $serializer): Response
     {
-        if ($this->isGranted('ROLE_ADMIN') === false){
+        if (false === $this->isGranted('ROLE_ADMIN')) {
             return $this->json(['message' => 'you must be an admin to access this'], 403);
         }
 
@@ -98,25 +98,26 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function showResellers(ResellerRepository $resellerRepo, Request $request, SerializerInterface $serializer, PaginatorInterface $paginator): Response
+    public function showResellers(ResellerRepository $resellerRepo, Request $request, SerializerInterface $serializer, Paginator $paginator): Response
     {
-        if ($this->isGranted('ROLE_ADMIN') === false){
+        if (false === $this->isGranted('ROLE_ADMIN')) {
             return $this->json(['message' => 'you must be an admin to access this'], 403);
         }
-        
+
         // get data
         $resellers = $resellerRepo->findAll();
 
         // pagination
-        $paginated = $paginator->paginate(
+        $paginated = $paginator->getPaginatedData(
             $resellers,
             $request->query->getInt('page', 1), /*page number*/
-            $this->getParameter('pagination_limit') /*limit per page*/
+            $this->getParameter('pagination_limit'), /*limit per page*/
+            $request
         );
 
         if (null !== $resellers) {
             $json = $serializer->serialize($paginated, 'json');
-            
+
             $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
             // cache publicly for 3600 seconds
@@ -196,7 +197,7 @@ class ResellerController extends AbstractController
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 
-    /**
+    /*
      * @OA\Post(
      *      path="/api/v1/auth/login",
      *      tags={"login and signin"},

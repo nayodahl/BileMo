@@ -3,8 +3,8 @@
 namespace App\Controller;
 
 use App\Repository\PhoneRepository;
+use App\Service\Paginator;
 use JMS\Serializer\SerializerInterface;
-use Knp\Component\Pager\PaginatorInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -87,16 +87,17 @@ class PhoneController extends AbstractController
      *      ),
      * )
      */
-    public function showPhones(PhoneRepository $phoneRepo, Request $request, SerializerInterface $serializer, PaginatorInterface $paginator): Response
+    public function showPhones(PhoneRepository $phoneRepo, Request $request, SerializerInterface $serializer, Paginator $paginator): Response
     {
         // get data
         $phones = $phoneRepo->findAll();
 
         // pagination
-        $paginated = $paginator->paginate(
+        $paginated = $paginator->getPaginatedData(
             $phones,
             $request->query->getInt('page', 1), /*page number*/
-            $this->getParameter('pagination_limit') /*limit per page*/
+            $this->getParameter('pagination_limit'),/*limit per page*/
+            $request
         );
 
         if (null !== $phones) {

@@ -4,9 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
+use App\Service\Paginator;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
-use Knp\Component\Pager\PaginatorInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -92,16 +92,17 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function showCustomers(CustomerRepository $customerRepo, Security $security, Request $request, SerializerInterface $serializer, PaginatorInterface $paginator): Response
+    public function showCustomers(CustomerRepository $customerRepo, Security $security, Request $request, SerializerInterface $serializer, Paginator $paginator): Response
     {
         //get data
         $customers = $customerRepo->findAllCustomersofOneReseller($security->getUser()->getId());
 
         // pagination
-        $paginated = $paginator->paginate(
+        $paginated = $paginator->getPaginatedData(
             $customers,
             $request->query->getInt('page', 1), /*page number*/
-            $this->getParameter('pagination_limit') /*limit per page*/
+            $this->getParameter('pagination_limit'), /*limit per page*/
+            $request
         );
 
         if (null !== $customers) {
@@ -180,7 +181,7 @@ class CustomerController extends AbstractController
 
         // check if customer already exists and linked to this reseller.
         // a customer email must be unique but only to one reseller, a customer can be registred to more than one reseller.
-        if ($customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail()) !== null){
+        if (null !== $customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail())) {
             return $this->json(['message' => 'this customer already exists'], 400);
         }
 
