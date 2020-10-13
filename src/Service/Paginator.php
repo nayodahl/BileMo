@@ -16,17 +16,19 @@ class Paginator
 
     public function getPaginatedData($phones, int $page, int $limit, Request $request)
     {
-        // pagination
+        // pagination base on knp Paginator
         $paginated = $this->knpPaginator->paginate(
             $phones,
             $page, /*page number*/
             $limit,/*limit per page*/
         );
 
+        // getting some data generated from knp Paginator
         $items = $paginated->getItems();
         $itemsPerPage = $paginated->getItemNumberPerPage();
         $totalCount = $paginated->getTotalItemCount();
 
+        // generating previous and next links if possible
         $previousPage = $nextPage = null;
         if ($page > 1) {
             $previousPage = ($page - 1);
@@ -38,6 +40,7 @@ class Paginator
             $nextPageLink = $request->getUriForPath($request->getPathInfo().'?page='.$nextPage);
         }
 
+        // validating user input
         if ($page > $totalPages) {
             return ['message' => 'invalid page number'];
         }
