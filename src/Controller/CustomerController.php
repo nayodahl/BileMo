@@ -2,9 +2,11 @@
 
 namespace App\Controller;
 
+use Ambta\DoctrineEncryptBundle\Encryptors\EncryptorInterface;
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
 use App\Service\Paginator;
+use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
@@ -171,7 +173,10 @@ class CustomerController extends AbstractController
     {
         $reseller = $security->getUser();
 
-        $customer = $serializer->deserialize($request->getContent(), Customer::class, 'json');
+        $context = new DeserializationContext();
+        $context->setGroups("create_customer");
+
+        $customer = $serializer->deserialize($request->getContent(), Customer::class, 'json', $context);
         $customer->setReseller($reseller);
 
         $errors = $validator->validate($customer);
@@ -180,7 +185,7 @@ class CustomerController extends AbstractController
         }
 
         // check if customer already exists and linked to this reseller.
-        // a customer email must be unique but only to one reseller, a customer can be registred to more than one reseller.
+        // a customer email must be unique but only to one reseller, indeed a customer can be registred to more than one reseller.
         if (null !== $customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail())) {
             return $this->json(['message' => 'this customer already exists'], 400);
         }
