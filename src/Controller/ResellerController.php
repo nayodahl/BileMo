@@ -7,6 +7,7 @@ use App\Repository\ResellerRepository;
 use App\Service\Paginator;
 use JMS\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -171,7 +172,7 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator): JsonResponse
+    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator, LoggerInterface $logger): JsonResponse
     {
         $encoder = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
@@ -184,6 +185,9 @@ class ResellerController extends AbstractController
         // check if input data is valid (email valid and unique, password complex enough)
         $errors = $validator->validate($reseller);
         if (count($errors) > 0) {
+            $logger->error('registration input is invalid',[
+                'errors' => $errors
+            ]);
             return $this->json(['message' => $errors], 400);
         }
 
@@ -194,6 +198,9 @@ class ResellerController extends AbstractController
         $manager->persist($reseller);
         $manager->flush();
 
+        $logger->info('new reseller registrated',[
+            'email' => $reseller->getEmail()
+        ]);
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 

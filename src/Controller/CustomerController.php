@@ -10,6 +10,7 @@ use JMS\Serializer\DeserializationContext;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
+use Psr\Log\LoggerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -169,7 +170,7 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function CreateCustomer(CustomerRepository $customerRepo, Request $request, ValidatorInterface $validator, Security $security, SerializerInterface $serializer): JsonResponse
+    public function CreateCustomer(CustomerRepository $customerRepo, Request $request, ValidatorInterface $validator, Security $security, SerializerInterface $serializer, LoggerInterface $logger): JsonResponse
     {
         $reseller = $security->getUser();
 
@@ -181,12 +182,18 @@ class CustomerController extends AbstractController
 
         $errors = $validator->validate($customer);
         if (count($errors) > 0) {
+            $logger->error('Customer creation input is invalid',[
+                'errors' => $errors
+            ]);
             return $this->json(['message' => $errors], 400);
         }
 
         // check if customer already exists and linked to this reseller.
         // a customer email must be unique but only to one reseller, indeed a customer can be registred to more than one reseller.
         if (null !== $customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail())) {
+            $logger->error('customer already exists',[
+                'cause' => 'email : ' . $customer->getEmail() . ' already exists with reseller id = ' . $reseller->getId()
+            ]);
             return $this->json(['message' => 'this customer already exists'], 400);
         }
 
@@ -194,6 +201,10 @@ class CustomerController extends AbstractController
         $em->persist($customer);
         $em->flush();
 
+        $logger->info('new customer created',[
+            'email' => $customer->getEmail(),
+            'reseller' => $reseller->getId()
+        ]);
         return $this->json(['message' => 'customer created'], 201);
     }
 
@@ -226,7 +237,7 @@ class CustomerController extends AbstractController
      *      ),
      * )
      */
-    public function DeleteCustomer(int $customerId, CustomerRepository $customerRepo, Security $security): JsonResponse
+    public function DeleteCustomer(int $customerId, CustomerRepository $customerRepo, Security $security, LoggerInterface $logger): JsonResponse
     {
         $reseller = $security->getUser();
         $customer = $customerRepo->find($customerId);
@@ -237,12 +248,24 @@ class CustomerController extends AbstractController
 
         // check if the logged reseller is the one that owns the customer
         if ($reseller !== $customer->getReseller()) {
+
+            $logger->alert('customer deletion denied',[
+                'customer id' => $customer->getId(),
+                'owning reseller id' => $customer->getReseller()->getId(),
+                'requestor reseller id' => $reseller->getId()
+            ]);
             return $this->json(['message' => 'you are not authorized to delete this customer'], 403);
         }
 
         $em = $this->getDoctrine()->getManager();
         $em->remove($customer);
         $em->flush();
+
+        $logger->info('customer deleted',[
+            'id' => $customerId,
+            'email' => $customer->getEmail(),
+            'reseller' => $reseller->getId()
+        ]);
 
         return $this->json(['message' => 'customer has been deleted'], 204);
     }
