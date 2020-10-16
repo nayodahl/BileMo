@@ -33,7 +33,7 @@ class CustomerController extends AbstractController
      *      @OA\Parameter(
      *          name="customerId",
      *          in="path",
-     *          description="ID of customer to return",
+     *          description="Id of customer to return",
      *          required=true,
      *          @OA\Schema(
      *              type="integer",
@@ -42,16 +42,30 @@ class CustomerController extends AbstractController
      *      ),
      *      @OA\Response(
      *          response="200",
-     *          description="successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/Customer"),
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              ref="#/components/schemas/Customer",
+     *              example={
+     *                  "id": "200", "firstname": "Michel", "lastname": "Cooper", "email": "m.cooper@exemple.com", "reseller": { "id":"24", "email":"exemple@reseller.com", "customer":"[]", "_links":"..."}, 
+     *                  "_links": {
+     *                      "self": "...", "create":"...", "delete":"..."
+     *                  },
+     *              },
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=404,
-     *          description="customer not found"
+     *          description="Customer not found",
+     *          @OA\JsonContent(
+     *              example={"message": "This customer does not exist, or is not yours"},
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=400,
-     *          description="Invalid ID supplier"
+     *          description="Invalid Id supplied",
+     *          @OA\JsonContent(
+     *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
+     *          ),
      *     )
      * )
      */
@@ -73,7 +87,7 @@ class CustomerController extends AbstractController
             return $response;
         }
 
-        return $this->json(['message' => 'this customer does not exist, or is not yours'], 404);
+        return $this->json(['message' => 'This customer does not exist, or is not yours'], 404);
     }
 
     /**
@@ -182,7 +196,7 @@ class CustomerController extends AbstractController
 
         $errors = $validator->validate($customer);
         if (count($errors) > 0) {
-            $logger->error('Customer creation input is invalid',[
+            $logger->warning('Customer creation input is invalid',[
                 'errors' => $errors
             ]);
             return $this->json(['message' => $errors], 400);
@@ -191,7 +205,7 @@ class CustomerController extends AbstractController
         // check if customer already exists and linked to this reseller.
         // a customer email must be unique but only to one reseller, indeed a customer can be registred to more than one reseller.
         if (null !== $customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail())) {
-            $logger->error('customer already exists',[
+            $logger->warning('customer already exists',[
                 'cause' => 'email : ' . $customer->getEmail() . ' already exists with reseller id = ' . $reseller->getId()
             ]);
             return $this->json(['message' => 'this customer already exists'], 400);
@@ -249,7 +263,7 @@ class CustomerController extends AbstractController
         // check if the logged reseller is the one that owns the customer
         if ($reseller !== $customer->getReseller()) {
 
-            $logger->alert('customer deletion denied',[
+            $logger->warning('customer deletion denied',[
                 'customer id' => $customer->getId(),
                 'owning reseller id' => $customer->getReseller()->getId(),
                 'requestor reseller id' => $reseller->getId()

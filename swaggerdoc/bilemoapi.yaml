@@ -15,22 +15,46 @@ paths:
         -
           name: customerId
           in: path
-          description: 'ID of customer to return'
+          description: 'Id of customer to return'
           required: true
           schema:
             type: integer
             format: int
       responses:
         '200':
-          description: 'successful operation'
+          description: 'Successful operation'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Customer'
+              example:
+                id: '200'
+                firstname: Michel
+                lastname: Cooper
+                email: m.cooper@exemple.com
+                reseller:
+                  id: '24'
+                  email: exemple@reseller.com
+                  customer: '[]'
+                  _links: ...
+                _links:
+                  self: ...
+                  create: ...
+                  delete: ...
         '404':
-          description: 'customer not found'
+          description: 'Customer not found'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'This customer does not exist, or is not yours'
         '400':
-          description: 'Invalid ID supplier'
+          description: 'Invalid Id supplied'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Bad request. Check your parameters, reminder that documention is here : ...'
     delete:
       tags:
         - customer
@@ -112,15 +136,40 @@ paths:
             format: int
       responses:
         '200':
-          description: 'successful operation'
+          description: 'Successful operation'
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Phone'
+              example:
+                id: '36'
+                brand: Samsung
+                description: 'Samsung Galaxy S10'
+                price: '759.0'
+                internal_reference: S10-G981BLBDEUB
+                _links: ...
         '404':
-          description: 'Phone not found'
+          description: 'Phone not found, the id supplied does not exist'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Phone not found'
         '400':
-          description: 'Invalid ID supplier'
+          description: 'Invalid Id supplied'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Bad request. Check your parameters, reminder that documention is here : ...'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
   /api/v1/phones:
     get:
       tags:
@@ -131,14 +180,37 @@ paths:
       responses:
         '200':
           description: 'successful operation'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                current_page_number: '1'
+                number_items_per_page: '10'
+                total_items_count: '2'
+                items:
+                  - { id: '36', brand: Samsung, description: 'Samsung Galaxy S10', price: '759.0', internal_reference: S10-G981BLBDEUB, _links: ... }
+                  - { id: '37', brand: Samsung, description: 'Samsung Galaxy S10+', price: '859.0', internal_reference: S10+-G981BLBDEUA, _links: ... }
         '404':
-          description: 'there is no phone for the moment'
+          description: 'There is no phone for the moment'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'There is no phone for the moment'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
   '/api/v1/resellers/{resellerId}':
     get:
       tags:
         - reseller
-      summary: 'Find reseller by ID'
-      description: 'Returns a single reseller'
+      summary: 'Find reseller by Id'
+      description: 'Returns a single reseller detail with all its customers, you need to be an authenticated admin'
       operationId: 'App\Controller\ResellerController::showReseller'
       parameters:
         -
@@ -156,10 +228,42 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Reseller'
+              example:
+                id: '22'
+                email: exemple@phonecompany.com
+                customer:
+                  - { id: '155', firstname: Natalia, lastname: Bashirian, email: coldy.san@yahoo.fr, _links: ... }
+                  - { id: '156', firstname: Rachel, lastname: Dupont, email: rachel.d@free.fr, _links: ... }
+                _links: ...
         '404':
-          description: 'Reseller not found'
+          description: 'Reseller not found, the id supplied does not exist'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Reseller not found'
         '400':
-          description: 'Invalid ID supplier'
+          description: 'Invalid Id supplied'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Bad request. Check your parameters, reminder that documention is here : ...'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
+        '403':
+          description: 'Not authorized access'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'You must be an admin to access this'
   /api/v1/resellers:
     get:
       tags:
@@ -170,8 +274,38 @@ paths:
       responses:
         '200':
           description: 'successful operation'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                current_page_number: '1'
+                number_items_per_page: '10'
+                total_items_count: '2'
+                items:
+                  - { id: '22', email: exemple@phonecompany.com, _links: ... }
+                  - { id: '23', email: dev@phonereseller.com, _links: ... }
         '404':
-          description: 'there is no reseller for the moment'
+          description: 'There is no reseller for the moment'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'There is no reseller for the moment'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
+        '403':
+          description: 'Not authorized access'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'You must be an admin to access this'
   /api/v1/auth/signin:
     post:
       tags:
@@ -187,10 +321,10 @@ paths:
             schema:
               properties:
                 email:
-                  description: 'enter your email as identifier, it must not be already taken'
+                  description: 'Enter your email as identifier, it must not be already taken'
                   type: string
                 password:
-                  description: 'enter your chosen password, minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).'
+                  description: 'Enter your chosen password, minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).'
                   type: string
               type: object
               example:
@@ -199,8 +333,18 @@ paths:
       responses:
         '201':
           description: 'successful operation'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'You registered as a Reseller with success'
         '400':
-          description: 'input is not valid'
+          description: 'Invalid input'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Bad request. Check your parameters, reminder that documention is here : ...'
   /api/v1/auth/login:
     post:
       tags:
@@ -208,17 +352,17 @@ paths:
       summary: 'Login to BileMo API to get your authentication token (Bearer token)'
       description: 'This can only be done by a registred reseller. It will let you obtain a token to make all others requests to the API that need authentication (almost all requests).'
       requestBody:
-        description: 'enter your credentials'
+        description: 'Enter your credentials'
         required: true
         content:
           application/json:
             schema:
               properties:
                 username:
-                  description: 'enter the email you registred with as identifier'
+                  description: 'Enter the email you registred with as identifier'
                   type: string
                 password:
-                  description: 'enter your password'
+                  description: 'Enter your password'
                   type: string
               type: object
               example:
@@ -231,12 +375,25 @@ paths:
             application/json:
               schema:
                 properties:
-                  token: { description: 'your precious token', type: string }
+                  token: { description: 'Your precious token', type: string }
                 type: object
                 example:
                   token: eyJ7eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MDIwNTU3NjAsImV4cCI6MTYwMjA1OTM2MCwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiZGV2QGxkbGMuY29tIn0.SI5UDCNxGewjFJt86olg4DbmHx6Hl9E1UqGHAWhEXIiDJNWlKVq4_evwIuuk-EPoZV7BfEuAXU19_VFg1sGbEDhs20pzOC3G8pwKNZb_NTJ1E_tZ2Wq5GQpGw38uJa6qbYg4LoVs8EyMKrul-GQXA__Tm7blr9CU40PRrhMU4LdNf9wSitYFQ_9PJS0KpvjRfDgEMmt41QB-uUh2rUbNXcfUzfake5zeQQq_AoWMZBas3mUYdZe5np0jQvNHyuw2rit2OEIhVnZzHtMbVg6XACmYy9hHw--gQ7sjiSpqTq5ZeXW1b8AWTLQRiYMC3gLU89lvRHZs4GZLUZ4_c-4mxVNMBSf5J0yjHGW4buzVy5lx9rEY1tW9XeuYPKXKODisPNcX3p1j8XKwgEdjBC4LkhlDERFoADCYH75F5IURaMpj-HSs2U6fNcduQlm8NHd_y_ziywjj6a8qjvnIvUqWOMgYjSeesVBTZvWvNBiOqZ1yRdjGAmDw5KSPReTKPsq6IBHQersaZ_YMXwakVaTdJi7IZ-IhjJTIHuBxtlfYQLNyJWHQTTMfoJPto4FFwtNysKvus1v9RIKACoB9KZcYm2gN9dbKFZFenCWHm-pGeLWGzpKdI-2Km-egT7WX9X27BHHhhqx7RfKa7AWO9JR3G20vpbSBfx8YeVXWofesW2I
         '400':
-          description: 'invalid credentials'
+          description: 'Invalid input'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Bad request. Check your parameters, reminder that documention is here : ...'
+        '401':
+          description: 'Invalid credentials'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'Invalid credentials.'
 components:
   schemas:
     Customer:

@@ -28,8 +28,8 @@ class ResellerController extends AbstractController
      * @OA\Get(
      *      path="/api/v1/resellers/{resellerId}",
      *      tags={"reseller"},
-     *      summary="Find reseller by ID",
-     *      description="Returns a single reseller",
+     *      summary="Find reseller by Id",
+     *      description="Returns a single reseller detail with all its customers, you need to be an authenticated admin",
      *      @OA\Parameter(
      *          name="resellerId",
      *          in="path",
@@ -43,22 +43,51 @@ class ResellerController extends AbstractController
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/Reseller"),
+     *          @OA\JsonContent(
+     *              ref="#/components/schemas/Reseller",
+     *              example={
+     *                  "id": "22", "email": "exemple@phonecompany.com", "customer": {
+     *                      {"id": "155", "firstname":"Natalia", "lastname":"Bashirian", "email":"coldy.san@yahoo.fr", "_links": "..."},
+     *                      {"id": "156", "firstname":"Rachel", "lastname":"Dupont", "email":"rachel.d@free.fr", "_links": "..."},
+     *                  },
+     *                  "_links": "..."
+     *                  },             
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=404,
-     *          description="Reseller not found"
+     *          description="Reseller not found, the id supplied does not exist",
+     *          @OA\JsonContent(
+     *              example={"message": "Reseller not found"},
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=400,
-     *          description="Invalid ID supplier"
-     *     )
+     *          description="Invalid Id supplied",
+     *          @OA\JsonContent(
+     *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Not authorized access",
+     *          @OA\JsonContent(
+     *              example={"message": "You must be an admin to access this"},
+     *          ),
+     *      ),
      * )
      */
     public function showReseller(int $resellerId, ResellerRepository $resellerRepo, SerializerInterface $serializer): Response
     {
         if (false === $this->isGranted('ROLE_ADMIN')) {
-            return $this->json(['message' => 'you must be an admin to access this'], 403);
+            return $this->json(['message' => 'You must be an admin to access this'], 403);
         }
 
         $reseller = $resellerRepo->find($resellerId);
@@ -77,7 +106,7 @@ class ResellerController extends AbstractController
             return $response;
         }
 
-        return $this->json(['message' => 'this reseller does not exist'], 404);
+        return $this->json(['message' => 'Reseller not found'], 404);
     }
 
     /**
@@ -92,10 +121,38 @@ class ResellerController extends AbstractController
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
+     *          @OA\JsonContent(
+     *              example={
+     *                  "current_page_number": "1", 
+     *                  "number_items_per_page": "10", 
+     *                  "total_items_count": "2", 
+     *                  "items": {
+     *                      {"id": "22", "email": "exemple@phonecompany.com", "_links": "..."},
+     *                      {"id": "23", "email": "dev@phonereseller.com", "_links": "..."},
+     *                  },
+     *              },
+     *          ), 
      *      ),
      *      @OA\Response(
      *          response="404",
-     *          description="there is no reseller for the moment"
+     *          description="There is no reseller for the moment",
+     *          @OA\JsonContent(
+     *              example={"message": "There is no reseller for the moment"},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=403,
+     *          description="Not authorized access",
+     *          @OA\JsonContent(
+     *              example={"message": "You must be an admin to access this"},
+     *          ),
      *      ),
      * )
      */
@@ -150,30 +207,36 @@ class ResellerController extends AbstractController
      *                 type="object",
      *                 @OA\Property(
      *                     property="email",
-     *                     description="enter your email as identifier, it must not be already taken",
+     *                     description="Enter your email as identifier, it must not be already taken",
      *                     type="string",
      *                 ),
      *                 @OA\Property(
      *                     property="password",
-     *                     description="enter your chosen password, minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).",
+     *                     description="Enter your chosen password, minimum 8 characters, one uppercase, one lowercase, one number and one special character among #?!@$ %^&*-).",
      *                     type="string"
      *                 ),
-     *                 example={"email": "exemple@mymail.com", "password": "mychosenpassword"}
+     *                 example={"email": "exemple@mymail.com", "password": "mychosenpassword"},
      *             ),
      *          ),
      *      ),
      *      @OA\Response(
      *          response="201",
      *          description="successful operation",
+     *          @OA\JsonContent(
+     *              example={"message": "You registered as a Reseller with success"},
+     *          ),
      *      ),
      *      @OA\Response(
-     *          response="400",
-     *          description="input is not valid"
+     *          response=400,
+     *          description="Invalid input",
+     *          @OA\JsonContent(
+     *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
+     *          ),
      *      ),
      * )
      */
     public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator, LoggerInterface $logger): JsonResponse
-    {
+    {       
         $encoder = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $serializer = new Serializer($normalizers, $encoder);
@@ -185,7 +248,7 @@ class ResellerController extends AbstractController
         // check if input data is valid (email valid and unique, password complex enough)
         $errors = $validator->validate($reseller);
         if (count($errors) > 0) {
-            $logger->error('registration input is invalid',[
+            $logger->warning('registration input is invalid',[
                 'errors' => $errors
             ]);
             return $this->json(['message' => $errors], 400);
@@ -204,14 +267,14 @@ class ResellerController extends AbstractController
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 
-    /*
+    /**
      * @OA\Post(
      *      path="/api/v1/auth/login",
      *      tags={"login and signin"},
      *      summary="Login to BileMo API to get your authentication token (Bearer token)",
      *      description="This can only be done by a registred reseller. It will let you obtain a token to make all others requests to the API that need authentication (almost all requests).",
      *      @OA\RequestBody(
-     *         description="enter your credentials",
+     *         description="Enter your credentials",
      *         required=true,
      *         @OA\MediaType(
      *             mediaType="application/json",
@@ -219,12 +282,12 @@ class ResellerController extends AbstractController
      *                 type="object",
      *                 @OA\Property(
      *                     property="username",
-     *                     description="enter the email you registred with as identifier",
+     *                     description="Enter the email you registred with as identifier",
      *                     type="string",
      *                 ),
      *                 @OA\Property(
      *                     property="password",
-     *                     description="enter your password",
+     *                     description="Enter your password",
      *                     type="string"
      *                 ),
      *                 example={"username": "exemple@mymail.com", "password": "mypassword"}
@@ -240,7 +303,7 @@ class ResellerController extends AbstractController
      *                 type="object",
      *                 @OA\Property(
      *                     property="token",
-     *                     description="your precious token",
+     *                     description="Your precious token",
      *                     type="string",
      *                 ),
      *                 example={"token": "eyJ7eXAiOiJKV1QiLCJhbGciOiJSUzI1NiJ9.eyJpYXQiOjE2MDIwNTU3NjAsImV4cCI6MTYwMjA1OTM2MCwicm9sZXMiOlsiUk9MRV9VU0VSIl0sInVzZXJuYW1lIjoiZGV2QGxkbGMuY29tIn0.SI5UDCNxGewjFJt86olg4DbmHx6Hl9E1UqGHAWhEXIiDJNWlKVq4_evwIuuk-EPoZV7BfEuAXU19_VFg1sGbEDhs20pzOC3G8pwKNZb_NTJ1E_tZ2Wq5GQpGw38uJa6qbYg4LoVs8EyMKrul-GQXA__Tm7blr9CU40PRrhMU4LdNf9wSitYFQ_9PJS0KpvjRfDgEMmt41QB-uUh2rUbNXcfUzfake5zeQQq_AoWMZBas3mUYdZe5np0jQvNHyuw2rit2OEIhVnZzHtMbVg6XACmYy9hHw--gQ7sjiSpqTq5ZeXW1b8AWTLQRiYMC3gLU89lvRHZs4GZLUZ4_c-4mxVNMBSf5J0yjHGW4buzVy5lx9rEY1tW9XeuYPKXKODisPNcX3p1j8XKwgEdjBC4LkhlDERFoADCYH75F5IURaMpj-HSs2U6fNcduQlm8NHd_y_ziywjj6a8qjvnIvUqWOMgYjSeesVBTZvWvNBiOqZ1yRdjGAmDw5KSPReTKPsq6IBHQersaZ_YMXwakVaTdJi7IZ-IhjJTIHuBxtlfYQLNyJWHQTTMfoJPto4FFwtNysKvus1v9RIKACoB9KZcYm2gN9dbKFZFenCWHm-pGeLWGzpKdI-2Km-egT7WX9X27BHHhhqx7RfKa7AWO9JR3G20vpbSBfx8YeVXWofesW2I"}
@@ -248,8 +311,18 @@ class ResellerController extends AbstractController
      *          ),
      *      ),
      *      @OA\Response(
-     *          response="400",
-     *          description="invalid credentials"
+     *          response=400,
+     *          description="Invalid input",
+     *          @OA\JsonContent(
+     *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Invalid credentials",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "Invalid credentials."},
+     *          ),
      *      ),
      * )
      **/

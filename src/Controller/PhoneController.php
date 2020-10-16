@@ -29,22 +29,38 @@ class PhoneController extends AbstractController
      *          required=true,
      *          @OA\Schema(
      *              type="integer",
-     *              format="int"
-     *               )
+     *              format="int",
+     *          ),
      *      ),
      *      @OA\Response(
      *          response="200",
-     *          description="successful operation",
-     *          @OA\JsonContent(ref="#/components/schemas/Phone"),
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              ref="#/components/schemas/Phone",
+     *              example={"id": "36", "brand": "Samsung", "description": "Samsung Galaxy S10", "price": "759.0", "internal_reference": "S10-G981BLBDEUB", "_links": "..."},
+     *          ),        
      *      ),
      *      @OA\Response(
      *          response=404,
-     *          description="Phone not found"
+     *          description="Phone not found, the id supplied does not exist",
+     *          @OA\JsonContent(
+     *              example={"message": "Phone not found"},
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=400,
-     *          description="Invalid ID supplier"
-     *     )
+     *          description="Invalid Id supplied",
+     *          @OA\JsonContent(
+     *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
+     *      ),
      * )
      */
     public function showPhone(int $phoneId, PhoneRepository $phoneRepo, SerializerInterface $serializer): Response
@@ -80,10 +96,31 @@ class PhoneController extends AbstractController
      *      @OA\Response(
      *          response="200",
      *          description="successful operation",
+     *          @OA\JsonContent(
+     *              example={
+     *                  "current_page_number": "1", 
+     *                  "number_items_per_page": "10", 
+     *                  "total_items_count": "2", 
+     *                  "items": {
+     *                      {"id": "36", "brand": "Samsung", "description": "Samsung Galaxy S10", "price": "759.0", "internal_reference": "S10-G981BLBDEUB", "_links": "..."},
+     *                      {"id": "37", "brand": "Samsung", "description": "Samsung Galaxy S10+", "price": "859.0", "internal_reference": "S10+-G981BLBDEUA", "_links": "..."},
+     *                  },
+     *              },
+     *          ),  
      *      ),
      *      @OA\Response(
      *          response=404,
-     *          description="there is no phone for the moment"
+     *          description="There is no phone for the moment",
+     *          @OA\JsonContent(
+     *              example={"message": "There is no phone for the moment"},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
      *      ),
      * )
      */
@@ -115,6 +152,6 @@ class PhoneController extends AbstractController
             return $response;
         }
 
-        return $this->json(['message' => 'there is no phone for the moment'], 404);
+        return $this->json(['message' => 'There is no phone for the moment'], 404);
     }
 }
