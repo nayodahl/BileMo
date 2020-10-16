@@ -34,8 +34,8 @@ class Phone
      * @ORM\Column(type="integer")
      * @OA\Property(
      *     format="int64",
-     *     description="ID",
-     *     title="ID",
+     *     description="Id",
+     *     title="Id",
      * )
      * @Serializer\XmlAttribute
      */

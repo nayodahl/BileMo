@@ -54,8 +54,8 @@ class Customer
      * @Groups({"show_resellers", "show_customers"})
      * @OA\Property(
      *     format="int64",
-     *     description="ID",
-     *     title="ID",
+     *     description="Id",
+     *     title="Id",
      * )
      * @Serializer\XmlAttribute
      */

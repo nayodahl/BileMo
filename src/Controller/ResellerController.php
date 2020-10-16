@@ -120,7 +120,7 @@ class ResellerController extends AbstractController
      *      description="Returns a paginated list of all resellers, you need to be an authenticated admin. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/resellers?page=2 ",
      *      @OA\Response(
      *          response="200",
-     *          description="successful operation",
+     *          description="Successful operation",
      *          @OA\JsonContent(
      *              example={
      *                  "current_page_number": "1", 

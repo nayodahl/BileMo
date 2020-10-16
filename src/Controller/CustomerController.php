@@ -66,7 +66,14 @@ class CustomerController extends AbstractController
      *          @OA\JsonContent(
      *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
      *          ),
-     *     )
+     *     ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
+     *      ),
      * )
      */
     public function showCustomer(int $customerId, CustomerRepository $customerRepo, Security $security, SerializerInterface $serializer): Response
@@ -101,11 +108,55 @@ class CustomerController extends AbstractController
      *      description="Returns a paginated list of all your customers, you need to be an authenticated reseller. The list of results is paginated, so if you need next page, add the page number as parameter in the query. Exemple : /api/v1/customers?page=2 ",
      *      @OA\Response(
      *          response="200",
-     *          description="successful operation",
+     *          description="Successful operation",
+     *          @OA\JsonContent(
+     *              example={
+     *                  "current_page_number": "1", 
+     *                  "number_items_per_page": "10", 
+     *                  "total_items_count": "2", 
+     *                  "items": {
+     *                      {"id": "200", "firstname":"Alice", "lastname":"Cooper", "email": "a.cooper@exemple.com", "reseller": {
+     *                              "id":"24", "email":"dev@phonecompany.com", "customer":"[]", "_links": "{...}",
+     *                          }, 
+     *                          "_links": {
+     *                              "self": "{...}",
+     *                              "create": "{...}",
+     *                              "delete": "{...}",
+     *                          },
+     *                      },
+     *                      {"id": "202", "firstname":"Emily", "lastname":"Alphin", "email": "alphin@exemple.com", "reseller": {
+     *                              "id":"24", "email":"dev@phonecompany.com", "customer":"[]", "_links": "{...}",
+     *                          }, 
+     *                          "_links": {
+     *                              "self": "{...}",
+     *                              "create": "{...}",
+     *                              "delete": "{...}",
+     *                          },
+     *                      },
+     *                  },
+     *              },
+     *          ), 
      *      ),
      *      @OA\Response(
      *          response=404,
-     *          description="there is no customer for the moment"
+     *          description="Customers not found",
+     *          @OA\JsonContent(
+     *              example={"message": "There is no customer for the moment"},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=400,
+     *          description="Invalid request",
+     *          @OA\JsonContent(
+     *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
+     *          ),
+     *     ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
      *      ),
      * )
      */
@@ -137,7 +188,7 @@ class CustomerController extends AbstractController
             return $response;
         }
 
-        return $this->json(['message' => 'there is no customer for the moment'], 404);
+        return $this->json(['message' => 'There is no customer for the moment'], 404);
     }
 
     /**
@@ -157,17 +208,17 @@ class CustomerController extends AbstractController
      *                 type="object",
      *                 @OA\Property(
      *                     property="firstname",
-     *                     description="enter the firstname of the customer",
+     *                     description="Enter the firstname of the customer",
      *                     type="string",
      *                 ),
      *                 @OA\Property(
      *                     property="lastname",
-     *                     description="enter the lastname of the customer",
+     *                     description="Enter the lastname of the customer",
      *                     type="string"
      *                 ),
      *                 @OA\Property(
      *                     property="email",
-     *                     description="enter the email of the customer",
+     *                     description="Enter the email of the customer",
      *                     type="string"
      *                 ),
      *                 example={"firstname": "Emily", "lastname": "Cooper", "email": "emily.cooper@mymail.com"}
@@ -176,11 +227,24 @@ class CustomerController extends AbstractController
      *      ),
      *      @OA\Response(
      *          response="201",
-     *          description="customer created"
+     *          description="Customer created",
+     *          @OA\JsonContent(
+     *              example={"message": "Customer created"},
+     *          ),
      *      ),
      *      @OA\Response(
      *         response=400,
-     *         description="Invalid input"
+     *         description="Invalid input, or duplicate customer",
+     *          @OA\JsonContent(
+     *              example={"message": "Bad request. Check your parameters, reminder that documention is here : ..."},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
      *      ),
      * )
      */
@@ -208,7 +272,7 @@ class CustomerController extends AbstractController
             $logger->warning('customer already exists',[
                 'cause' => 'email : ' . $customer->getEmail() . ' already exists with reseller id = ' . $reseller->getId()
             ]);
-            return $this->json(['message' => 'this customer already exists'], 400);
+            return $this->json(['message' => 'This customer already exists'], 400);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -219,7 +283,7 @@ class CustomerController extends AbstractController
             'email' => $customer->getEmail(),
             'reseller' => $reseller->getId()
         ]);
-        return $this->json(['message' => 'customer created'], 201);
+        return $this->json(['message' => 'Customer created'], 201);
     }
 
     /**
@@ -230,7 +294,7 @@ class CustomerController extends AbstractController
      *      path="/api/v1/customers/{customerId}",
      *      tags={"customer"},
      *      summary="Deletes a customer",
-     *      description="Delete a customer linked to your account, you need to be an authenticated reseller",
+     *      description="Delete a customer linked to your account, you need to be an authenticated reseller.",
      *      @OA\Parameter(
      *         name="customerId",
      *         in="path",
@@ -243,11 +307,28 @@ class CustomerController extends AbstractController
      *      ),
      *      @OA\Response(
      *          response="204",
-     *          description="Delete a customer"
+     *          description="Customer deleted",
      *      ),
      *      @OA\Response(
      *         response=404,
      *         description="Customer not found",
+     *          @OA\JsonContent(
+     *              example={"message": "Customer does not exist"},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *         response=403,
+     *         description="Not authorized deletion",
+     *          @OA\JsonContent(
+     *              example={"message": "You are not authorized to delete this customer"},
+     *          ),
+     *      ),
+     *      @OA\Response(
+     *          response=401,
+     *          description="Bearer token missing",
+     *          @OA\JsonContent(
+     *              example={"code": "401", "message": "JWT Token not found"},
+     *          ),
      *      ),
      * )
      */
@@ -257,7 +338,7 @@ class CustomerController extends AbstractController
         $customer = $customerRepo->find($customerId);
 
         if (null === $customer) {
-            return $this->json(['message' => 'customer does not exist'], 404);
+            return $this->json(['message' => 'Customer does not exist'], 404);
         }
 
         // check if the logged reseller is the one that owns the customer
@@ -268,7 +349,7 @@ class CustomerController extends AbstractController
                 'owning reseller id' => $customer->getReseller()->getId(),
                 'requestor reseller id' => $reseller->getId()
             ]);
-            return $this->json(['message' => 'you are not authorized to delete this customer'], 403);
+            return $this->json(['message' => 'You are not authorized to delete this customer'], 403);
         }
 
         $em = $this->getDoctrine()->getManager();
@@ -281,6 +362,6 @@ class CustomerController extends AbstractController
             'reseller' => $reseller->getId()
         ]);
 
-        return $this->json(['message' => 'customer has been deleted'], 204);
+        return $this->json([], 204);
     }
 }

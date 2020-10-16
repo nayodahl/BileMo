@@ -40,6 +40,11 @@ class Reseller implements UserInterface
      * @ORM\Id
      * @ORM\GeneratedValue
      * @ORM\Column(type="integer")
+     * @OA\Property(
+     *     format="int64",
+     *     description="Id",
+     *     title="Id",
+     * )
      * @Groups({"detail"})
      * @Serializer\XmlAttribute
      */
@@ -64,10 +69,6 @@ class Reseller implements UserInterface
      * @ORM\Column(type="string")
      * @Assert\NotBlank
      * @UserAssert\IsValidPassword
-     * @OA\Property(
-     *     description="reseller password",
-     *     title="Password",
-     * )
      * @Exclude
      */
     private $password;
@@ -80,6 +81,10 @@ class Reseller implements UserInterface
 
     /**
      * @ORM\OneToMany(targetEntity=Customer::class, mappedBy="reseller", orphanRemoval=true)
+     * @OA\Property(
+     *     description="Customer of the Reseller",
+     *     title="Customer",
+     * )
      * @MaxDepth(1)
      */
     private $customer;

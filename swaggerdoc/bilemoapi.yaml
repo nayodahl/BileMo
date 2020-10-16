@@ -55,11 +55,19 @@ paths:
               schema: {  }
               example:
                 message: 'Bad request. Check your parameters, reminder that documention is here : ...'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
     delete:
       tags:
         - customer
       summary: 'Deletes a customer'
-      description: 'Delete a customer linked to your account, you need to be an authenticated reseller'
+      description: 'Delete a customer linked to your account, you need to be an authenticated reseller.'
       operationId: 'App\Controller\CustomerController::DeleteCustomer'
       parameters:
         -
@@ -72,9 +80,29 @@ paths:
             format: int
       responses:
         '204':
-          description: 'Delete a customer'
+          description: 'Customer deleted'
         '404':
           description: 'Customer not found'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Customer does not exist'
+        '403':
+          description: 'Not authorized deletion'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'You are not authorized to delete this customer'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
   /api/v1/customers:
     get:
       tags:
@@ -84,9 +112,39 @@ paths:
       operationId: 'App\Controller\CustomerController::showCustomers'
       responses:
         '200':
-          description: 'successful operation'
+          description: 'Successful operation'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                current_page_number: '1'
+                number_items_per_page: '10'
+                total_items_count: '2'
+                items:
+                  - { id: '200', firstname: Alice, lastname: Cooper, email: a.cooper@exemple.com, reseller: { id: '24', email: dev@phonecompany.com, customer: '[]', _links: '{...}' }, _links: { self: '{...}', create: '{...}', delete: '{...}' } }
+                  - { id: '202', firstname: Emily, lastname: Alphin, email: alphin@exemple.com, reseller: { id: '24', email: dev@phonecompany.com, customer: '[]', _links: '{...}' }, _links: { self: '{...}', create: '{...}', delete: '{...}' } }
         '404':
-          description: 'there is no customer for the moment'
+          description: 'Customers not found'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'There is no customer for the moment'
+        '400':
+          description: 'Invalid request'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Bad request. Check your parameters, reminder that documention is here : ...'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
     post:
       tags:
         - customer
@@ -100,13 +158,13 @@ paths:
             schema:
               properties:
                 firstname:
-                  description: 'enter the firstname of the customer'
+                  description: 'Enter the firstname of the customer'
                   type: string
                 lastname:
-                  description: 'enter the lastname of the customer'
+                  description: 'Enter the lastname of the customer'
                   type: string
                 email:
-                  description: 'enter the email of the customer'
+                  description: 'Enter the email of the customer'
                   type: string
               type: object
               example:
@@ -115,9 +173,27 @@ paths:
                 email: emily.cooper@mymail.com
       responses:
         '201':
-          description: 'customer created'
+          description: 'Customer created'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Customer created'
         '400':
-          description: 'Invalid input'
+          description: 'Invalid input, or duplicate customer'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                message: 'Bad request. Check your parameters, reminder that documention is here : ...'
+        '401':
+          description: 'Bearer token missing'
+          content:
+            application/json:
+              schema: {  }
+              example:
+                code: '401'
+                message: 'JWT Token not found'
   '/api/v1/phones/{phoneId}':
     get:
       tags:
@@ -273,7 +349,7 @@ paths:
       operationId: 'App\Controller\ResellerController::showResellers'
       responses:
         '200':
-          description: 'successful operation'
+          description: 'Successful operation'
           content:
             application/json:
               schema: {  }
@@ -401,8 +477,8 @@ components:
       description: 'Customer model'
       properties:
         id:
-          title: ID
-          description: ID
+          title: Id
+          description: Id
           format: int64
         firstname:
           title: Firstname
@@ -422,8 +498,8 @@ components:
       description: 'Phone model'
       properties:
         id:
-          title: ID
-          description: ID
+          title: Id
+          description: Id
           format: int64
         brand:
           title: Brand
@@ -446,11 +522,14 @@ components:
       title: Reseller
       description: 'Reseller model'
       properties:
+        id:
+          title: Id
+          description: Id
+          format: int64
         email:
           title: Email
           description: 'reseller Email'
-        password:
-          title: Password
-          description: 'reseller password'
-          type: string
+        customer:
+          title: Customer
+          description: 'Customer of the Reseller'
       type: object
