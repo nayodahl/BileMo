@@ -14,19 +14,19 @@ security:
         # used to reload user from session & other features (e.g. switch_user)
     firewalls:
         main:
-            pattern: ^/api/doc
+            pattern: ^/api/v1/doc
             security: false
 
         signin:
-            pattern: ^/api/auth/signin
+            pattern: ^/api/v1/auth/signin
             security: false
         
         login:
-            pattern:  ^/api/auth/login
+            pattern:  ^/api/v1/auth/login
             stateless: true
             anonymous: true
             json_login:
-                check_path:               /api/auth/login
+                check_path:               /api/v1/auth/login
                 success_handler:          lexik_jwt_authentication.handler.authentication_success
                 failure_handler:          lexik_jwt_authentication.handler.authentication_failure
 
@@ -39,6 +39,6 @@ security:
 
 
     access_control:
-        - { path: ^/api/auth/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
-        - { path: ^/api/auth/signin, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/auth/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/api/v1/auth/signin, roles: IS_AUTHENTICATED_ANONYMOUSLY }
         - { path: ^/api,       roles: IS_AUTHENTICATED_FULLY }

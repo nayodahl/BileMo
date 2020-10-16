@@ -9,7 +9,10 @@
         "doctrine/doctrine-bundle": "^2.1",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.7",
+        "jms/serializer": "^3.9",
+        "knplabs/knp-paginator-bundle": "^5.3",
         "lexik/jwt-authentication-bundle": "^2.8",
+        "michaeldegroot/doctrine-encrypt-bundle": "^4.0",
         "phpdocumentor/reflection-docblock": "^5.2",
         "sensio/framework-extra-bundle": "^5.6",
         "symfony/apache-pack": "^1.0",
@@ -18,6 +21,7 @@
         "symfony/dotenv": "5.1.*",
         "symfony/flex": "^1.3.1",
         "symfony/framework-bundle": "5.1.*",
+        "symfony/monolog-bundle": "^3.6",
         "symfony/property-access": "5.1.*",
         "symfony/property-info": "5.1.*",
         "symfony/security-bundle": "5.1.*",
@@ -26,6 +30,7 @@
         "symfony/validator": "5.1.*",
         "symfony/yaml": "5.1.*",
         "twig/twig": "^2.12|^3.0",
+        "willdurand/hateoas-bundle": "^2.1",
         "zircote/swagger-php": "^3.1"
     },
     "require-dev": {

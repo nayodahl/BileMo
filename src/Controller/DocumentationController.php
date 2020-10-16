@@ -19,10 +19,19 @@ class DocumentationController extends AbstractController
      * Default route used to show documention.
      *
      * @Route("/", name="app_default")
-     * @Route("/api/doc", name="app_documentation")
+     * @Route("/api/v1/doc", name="app_documentation")
      */
     public function showDocumentation()
     {
-        return $this->render('base.html.twig');
+        $response = $this->render('base.html.twig');
+
+        // cache publicly for 3600 seconds
+        $response->setPublic();
+        $response->setMaxAge($this->getParameter('cache_duration'));
+
+        // (optional) set a custom Cache-Control directive
+        $response->headers->addCacheControlDirective('must-revalidate', true);
+
+        return $response;
     }
 }

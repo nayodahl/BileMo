@@ -83,14 +83,14 @@ class AppFixtures extends Fixture
 
         // create 1 reseller
         $reseller = new Reseller();
-        $reseller->setEmail($this->faker->companyEmail)
+        $reseller->setEmail('dev@phonecompany.com')
         ->setPassword($this->passwordEncoder->encodePassword(
             $reseller, '@dmIn123'
         ));
         $manager->persist($reseller);
 
-        // create 10 customers for this reseller
-        for ($i = 1; $i <= 10; ++$i) {
+        // create 20 customers for this reseller
+        for ($i = 1; $i <= 20; ++$i) {
             $customer = new Customer();
             $customer->setFirstname($this->faker->firstName)
                 ->setLastname($this->faker->lastName)
@@ -101,14 +101,14 @@ class AppFixtures extends Fixture
 
         // create 1 reseller
         $reseller = new Reseller();
-        $reseller->setEmail($this->faker->companyEmail)
+        $reseller->setEmail('dev@phonevendor.com')
         ->setPassword($this->passwordEncoder->encodePassword(
             $reseller, '@dmIn123'
         ));
         $manager->persist($reseller);
 
-        // create 10 customers for this reseller
-        for ($i = 1; $i <= 10; ++$i) {
+        // create 20 customers for this reseller
+        for ($i = 1; $i <= 20; ++$i) {
             $customer = new Customer();
             $customer->setFirstname($this->faker->firstName)
                 ->setLastname($this->faker->lastName)
@@ -116,6 +116,15 @@ class AppFixtures extends Fixture
                 ->setReseller($reseller);
             $manager->persist($customer);
         }
+
+        // create 1 admin account
+        $admin = new Reseller();
+        $admin->setEmail('admin@bilemo.com')
+        ->setPassword($this->passwordEncoder->encodePassword(
+            $admin, '@dmIn123'
+        ));
+        $admin->setRoles(['ROLE_ADMIN']);
+        $manager->persist($admin);
 
         $manager->flush();
     }

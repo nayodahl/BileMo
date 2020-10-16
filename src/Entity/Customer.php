@@ -5,18 +5,45 @@ namespace App\Entity;
 use App\Repository\CustomerRepository;
 use App\Validator as UserAssert;
 use Doctrine\ORM\Mapping as ORM;
+use Hateoas\Configuration\Annotation as Hateoas;
+use JMS\Serializer\Annotation as Serializer;
+use JMS\Serializer\Annotation\Groups;
+use JMS\Serializer\Annotation\MaxDepth;
+use JMS\Serializer\Annotation\Type;
 use OpenApi\Annotations as OA;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Ambta\DoctrineEncryptBundle\Configuration\Encrypted;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)
- * @UniqueEntity("email")
  * @OA\Schema(
  *      description="Customer model",
  *      title="Customer",
  * )
+ * @Hateoas\Relation(
+ *      "self",
+ *      href = @Hateoas\Route(
+ *          "app_customer",
+ *          parameters = { "customerId" = "expr(object.getId())" },
+ *          absolute = true,
+ *      )
+ * )
+ * @Hateoas\Relation(
+ *      "create",
+ *      href = @Hateoas\Route(
+ *          "app_create_customer",
+ *          absolute = true,
+ *      )
+ * )
+ * @Hateoas\Relation(
+ *      "delete",
+ *      href = @Hateoas\Route(
+ *          "app_delete_customer",
+ *          parameters = { "customerId" = "expr(object.getId())" },
+ *          absolute = true
+ *      )
+ * )
+ * @Serializer\XmlRoot("customer")
  */
 class Customer
 {
@@ -27,15 +54,18 @@ class Customer
      * @Groups({"show_resellers", "show_customers"})
      * @OA\Property(
      *     format="int64",
-     *     description="ID",
-     *     title="ID",
+     *     description="Id",
+     *     title="Id",
      * )
+     * @Serializer\XmlAttribute
      */
     private $id;
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"show_resellers", "show_customers"})
+     * @Groups({"show_resellers", "show_customers", "create_customer"})
+     * @Type("string")
+     * @Encrypted
      * @Assert\NotBlank
      * @UserAssert\IsValidName
      * @OA\Property(
@@ -47,7 +77,9 @@ class Customer
 
     /**
      * @ORM\Column(type="string", length=255)
-     * @Groups({"show_resellers", "show_customers"})
+     * @Groups({"show_resellers", "show_customers", "create_customer"})
+     * @Type("string")
+     * @Encrypted
      * @Assert\NotBlank
      * @UserAssert\IsValidName
      * @OA\Property(
@@ -58,8 +90,9 @@ class Customer
     private $lastname;
 
     /**
-     * @ORM\Column(type="string", length=255, unique=true)
-     * @Groups({"show_resellers", "show_customers"})
+     * @ORM\Column(type="string", length=255)
+     * @Groups({"show_resellers", "show_customers", "create_customer"})
+     * @Type("string")
      * @Assert\NotBlank
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."
@@ -78,6 +111,7 @@ class Customer
      *     description="customer parent Reseller",
      *     title="Reseller",
      * )
+     * @MaxDepth(1)
      */
     private $reseller;
 

@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Reseller;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
 use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
@@ -35,19 +34,5 @@ class ResellerRepository extends ServiceEntityRepository implements PasswordUpgr
         $user->setPassword($newEncodedPassword);
         $this->_em->persist($user);
         $this->_em->flush();
-    }
-
-    /**
-     * get all resellers account, with pagination.
-     */
-    public function findAllResellers(int $page, int $limit): ?Paginator
-    {
-        $query = $this->createQueryBuilder('r')
-        ->getQuery()
-        ->setFirstResult(($page - 1) * $limit)
-        ->setMaxResults($limit)
-        ;
-
-        return new Paginator($query);
     }
 }

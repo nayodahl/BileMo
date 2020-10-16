@@ -4,7 +4,6 @@ namespace App\Repository;
 
 use App\Entity\Customer;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -23,17 +22,13 @@ class CustomerRepository extends ServiceEntityRepository
     /**
      * Return all customers of a given Reseller.
      */
-    public function findAllCustomersofOneReseller(int $resellerId, int $page, int $limit): ?Paginator
+    public function findAllCustomersofOneReseller(int $resellerId)
     {
-        $query = $this->createQueryBuilder('c')
+        return $this->createQueryBuilder('c')
         ->innerJoin('c.reseller', 'cr')->addSelect('cr')
         ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
         ->getQuery()
-        ->setFirstResult(($page - 1) * $limit)
-        ->setMaxResults($limit)
         ;
-
-        return new Paginator($query);
     }
 
     /**
@@ -45,6 +40,20 @@ class CustomerRepository extends ServiceEntityRepository
         ->innerJoin('c.reseller', 'cr')->addSelect('cr')
         ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
         ->andWhere('c.id = :customerId')->setParameter('customerId', $customerId)
+        ->getQuery()
+        ->getOneOrNullResult()
+        ;
+    }
+
+    /**
+     * Return single customer of a given Reseller with a given email, or null.
+     */
+    public function findOneByEmailandReseller(int $resellerId, string $customerEmail): ?Customer
+    {
+        return $this->createQueryBuilder('c')
+        ->innerJoin('c.reseller', 'cr')->addSelect('cr')
+        ->where('c.reseller = :resellerId')->setParameter('resellerId', $resellerId)
+        ->andWhere('c.email = :customerEmail')->setParameter('customerEmail', $customerEmail)
         ->getQuery()
         ->getOneOrNullResult()
         ;
