@@ -113,6 +113,8 @@ class CustomerController extends AbstractController
      *                  "current_page_number": "1",
      *                  "number_items_per_page": "10",
      *                  "total_items_count": "2",
+     *                  "previous_page_link": "null",
+     *                  "next_page_link": "null",
      *                  "items": {
      *                      {"id": "200", "firstname":"Alice", "lastname":"Cooper", "email": "a.cooper@exemple.com", "reseller": {
      *                              "id":"24", "email":"dev@phonecompany.com", "customer":"[]", "_links": "{...}",

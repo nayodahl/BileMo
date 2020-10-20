@@ -127,6 +127,8 @@ class ResellerController extends AbstractController
      *                  "current_page_number": "1",
      *                  "number_items_per_page": "10",
      *                  "total_items_count": "2",
+     *                  "previous_page_link": "null",
+     *                  "next_page_link": "null",
      *                  "items": {
      *                      {"id": "22", "email": "exemple@phonecompany.com", "_links": "..."},
      *                      {"id": "23", "email": "dev@phonereseller.com", "_links": "..."},
@@ -267,7 +269,7 @@ class ResellerController extends AbstractController
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 
-    /*
+    /**
      * @OA\Post(
      *      path="/api/v1/auth/login",
      *      tags={"login and signin"},

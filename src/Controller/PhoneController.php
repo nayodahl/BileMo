@@ -102,6 +102,8 @@ class PhoneController extends AbstractController
      *                  "current_page_number": "1",
      *                  "number_items_per_page": "10",
      *                  "total_items_count": "2",
+     *                  "previous_page_link": "null",
+     *                  "next_page_link": "null",
      *                  "items": {
      *                      {"id": "36", "brand": "Samsung", "description": "Samsung Galaxy S10", "price": "759.0", "internal_reference": "S10-G981BLBDEUB", "_links": "..."},
      *                      {"id": "37", "brand": "Samsung", "description": "Samsung Galaxy S10+", "price": "859.0", "internal_reference": "S10+-G981BLBDEUA", "_links": "..."},

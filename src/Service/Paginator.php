@@ -42,7 +42,7 @@ class Paginator
         }
 
         // validating user input
-        if ($page > $totalPages) {
+        if (($page > $totalPages) && ($totalPages > 0)) {
             return ['message' => 'invalid page number'];
         }
 
