@@ -14,7 +14,7 @@ class Paginator
         $this->knpPaginator = $knpPaginator;
     }
 
-    public function getPaginatedData($phones, int $page, int $limit, Request $request)
+    public function getPaginatedData($phones, int $page, int $limit, Request $request): ?array
     {
         // pagination base on knp Paginator
         $paginated = $this->knpPaginator->paginate(
@@ -25,6 +25,12 @@ class Paginator
 
         // getting some data generated from knp Paginator
         $items = $paginated->getItems();
+
+        // if there is no result, we return null
+        if (empty($items)) {
+            return null;
+        }
+
         $itemsPerPage = $paginated->getItemNumberPerPage();
         $totalCount = $paginated->getTotalItemCount();
 

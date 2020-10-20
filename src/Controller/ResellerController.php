@@ -51,7 +51,7 @@ class ResellerController extends AbstractController
      *                      {"id": "156", "firstname":"Rachel", "lastname":"Dupont", "email":"rachel.d@free.fr", "_links": "..."},
      *                  },
      *                  "_links": "..."
-     *                  },             
+     *                  },
      *          ),
      *      ),
      *      @OA\Response(
@@ -123,15 +123,15 @@ class ResellerController extends AbstractController
      *          description="Successful operation",
      *          @OA\JsonContent(
      *              example={
-     *                  "current_page_number": "1", 
-     *                  "number_items_per_page": "10", 
-     *                  "total_items_count": "2", 
+     *                  "current_page_number": "1",
+     *                  "number_items_per_page": "10",
+     *                  "total_items_count": "2",
      *                  "items": {
      *                      {"id": "22", "email": "exemple@phonecompany.com", "_links": "..."},
      *                      {"id": "23", "email": "dev@phonereseller.com", "_links": "..."},
      *                  },
      *              },
-     *          ), 
+     *          ),
      *      ),
      *      @OA\Response(
      *          response="404",
@@ -236,7 +236,7 @@ class ResellerController extends AbstractController
      * )
      */
     public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator, LoggerInterface $logger): JsonResponse
-    {       
+    {
         $encoder = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $serializer = new Serializer($normalizers, $encoder);
@@ -248,9 +248,10 @@ class ResellerController extends AbstractController
         // check if input data is valid (email valid and unique, password complex enough)
         $errors = $validator->validate($reseller);
         if (count($errors) > 0) {
-            $logger->warning('registration input is invalid',[
-                'errors' => $errors
+            $logger->warning('registration input is invalid', [
+                'errors' => $errors,
             ]);
+
             return $this->json(['message' => $errors], 400);
         }
 
@@ -261,13 +262,14 @@ class ResellerController extends AbstractController
         $manager->persist($reseller);
         $manager->flush();
 
-        $logger->info('new reseller registrated',[
-            'email' => $reseller->getEmail()
+        $logger->info('new reseller registrated', [
+            'email' => $reseller->getEmail(),
         ]);
+
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 
-    /**
+    /*
      * @OA\Post(
      *      path="/api/v1/auth/login",
      *      tags={"login and signin"},

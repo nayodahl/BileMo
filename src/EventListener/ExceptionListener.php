@@ -21,7 +21,7 @@ class ExceptionListener
     public function onKernelException(ExceptionEvent $event)
     {
         //$exception = $event->getThrowable();
-        
+
         $json = $this->serializer->serialize([
             'message' => 'Bad request. Check your parameters, reminder that documention is here : '.
             $this->urlGenerator->generate('app_documentation', [], UrlGeneratorInterface::ABSOLUTE_URL),
