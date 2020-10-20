@@ -173,7 +173,7 @@ class CustomerController extends AbstractController
         );
 
         if (null !== $paginated) {
-            $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->enableMaxDepthChecks());
+            $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->enableMaxDepthChecks()->setSerializeNull(true));
 
             $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 

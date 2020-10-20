@@ -26,16 +26,11 @@ class Paginator
         // getting some data generated from knp Paginator
         $items = $paginated->getItems();
 
-        // if there is no result, we return null
-        if (empty($items)) {
-            return null;
-        }
-
         $itemsPerPage = $paginated->getItemNumberPerPage();
         $totalCount = $paginated->getTotalItemCount();
 
         // generating previous and next links if possible
-        $previousPage = $nextPage = null;
+        $previousPage = $nextPage = $previousPageLink = $nextPageLink = null;
         if ($page > 1) {
             $previousPage = ($page - 1);
             $previousPageLink = $request->getUriForPath($request->getPathInfo().'?page='.$previousPage);
@@ -51,12 +46,17 @@ class Paginator
             return ['message' => 'invalid page number'];
         }
 
+        // if there is no result, we return null
+        if (empty($items)) {
+            return null;
+        }
+
         return [
             'current_page_number' => $page,
             'number_items_per_page' => $itemsPerPage,
             'total_items_count' => $totalCount,
-            'previous_page_link' => (null !== $previousPage) ? $previousPageLink : null,
-            'next_page_link' => (null !== $nextPage) ? $nextPageLink : null,
+            'previous_page_link' => $previousPageLink,
+            'next_page_link' => $nextPageLink,
             'items' => $items,
         ];
     }

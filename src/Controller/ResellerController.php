@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\Reseller;
 use App\Repository\ResellerRepository;
 use App\Service\Paginator;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
 use Psr\Log\LoggerInterface;
@@ -174,7 +175,7 @@ class ResellerController extends AbstractController
             $request
         );
 
-        $json = $serializer->serialize($paginated, 'json');
+        $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->setSerializeNull(true));
 
         $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 

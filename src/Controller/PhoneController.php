@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Repository\PhoneRepository;
 use App\Service\Paginator;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -138,7 +139,7 @@ class PhoneController extends AbstractController
         );
 
         if (null !== $paginated) {
-            $json = $serializer->serialize($paginated, 'json');
+            $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->setSerializeNull(true));
 
             $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
