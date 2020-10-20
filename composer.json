@@ -15,6 +15,7 @@
         "michaeldegroot/doctrine-encrypt-bundle": "^4.0",
         "phpdocumentor/reflection-docblock": "^5.2",
         "sensio/framework-extra-bundle": "^5.6",
+        "sentry/sentry-symfony": "^3.5",
         "symfony/apache-pack": "^1.0",
         "symfony/asset": "5.1.*",
         "symfony/console": "5.1.*",

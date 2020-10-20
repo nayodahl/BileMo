@@ -440,7 +440,7 @@ paths:
           application/json:
             schema:
               properties:
-                username:
+                email:
                   description: 'Enter the email you registred with as identifier'
                   type: string
                 password:
@@ -448,7 +448,7 @@ paths:
                   type: string
               type: object
               example:
-                username: exemple@mymail.com
+                email: exemple@mymail.com
                 password: mypassword
       responses:
         '200':

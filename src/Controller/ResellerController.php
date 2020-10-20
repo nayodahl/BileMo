@@ -283,7 +283,7 @@ class ResellerController extends AbstractController
      *             @OA\Schema(
      *                 type="object",
      *                 @OA\Property(
-     *                     property="username",
+     *                     property="email",
      *                     description="Enter the email you registred with as identifier",
      *                     type="string",
      *                 ),
@@ -292,7 +292,7 @@ class ResellerController extends AbstractController
      *                     description="Enter your password",
      *                     type="string"
      *                 ),
-     *                 example={"username": "exemple@mymail.com", "password": "mypassword"}
+     *                 example={"email": "exemple@mymail.com", "password": "mypassword"}
      *             ),
      *          ),
      *      ),
