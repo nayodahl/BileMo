@@ -158,11 +158,12 @@ class ResellerController extends AbstractController
      */
     public function showResellers(ResellerRepository $resellerRepo, Request $request, SerializerInterface $serializer, Paginator $paginator): Response
     {
+        // we first test if the reseller has admin rights
         if (false === $this->isGranted('ROLE_ADMIN')) {
             return $this->json(['message' => 'you must be an admin to access this'], 403);
         }
 
-        // get data
+        // we now know that there is at least one reseller, there can not be empty data from pagination
         $resellers = $resellerRepo->findAll();
 
         // pagination
@@ -173,22 +174,18 @@ class ResellerController extends AbstractController
             $request
         );
 
-        if (null !== $resellers) {
-            $json = $serializer->serialize($paginated, 'json');
+        $json = $serializer->serialize($paginated, 'json');
 
-            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
+        $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
-            // cache publicly for 3600 seconds
-            $response->setPublic();
-            $response->setMaxAge($this->getParameter('cache_duration'));
+        // cache publicly for 3600 seconds
+        $response->setPublic();
+        $response->setMaxAge($this->getParameter('cache_duration'));
 
-            // (optional) set a custom Cache-Control directive
-            $response->headers->addCacheControlDirective('must-revalidate', true);
+        // (optional) set a custom Cache-Control directive
+        $response->headers->addCacheControlDirective('must-revalidate', true);
 
-            return $response;
-        }
-
-        return $this->json(['message' => 'there is no reseller for the moment'], 404);
+        return $response;
     }
 
     /**

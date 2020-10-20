@@ -137,7 +137,7 @@ class PhoneController extends AbstractController
             $request
         );
 
-        if (null !== $phones) {
+        if (null !== $paginated) {
             $json = $serializer->serialize($paginated, 'json');
 
             $response = new Response($json, 200, ['Content-Type' => 'application/json']);
