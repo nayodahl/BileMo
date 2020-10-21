@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use Ambta\DoctrineEncryptBundle\Configuration\Encrypted;
 use App\Repository\CustomerRepository;
 use App\Validator as UserAssert;
 use Doctrine\ORM\Mapping as ORM;
@@ -12,7 +13,6 @@ use JMS\Serializer\Annotation\MaxDepth;
 use JMS\Serializer\Annotation\Type;
 use OpenApi\Annotations as OA;
 use Symfony\Component\Validator\Constraints as Assert;
-use Ambta\DoctrineEncryptBundle\Configuration\Encrypted;
 
 /**
  * @ORM\Entity(repositoryClass=CustomerRepository::class)

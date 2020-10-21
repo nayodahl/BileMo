@@ -3,8 +3,11 @@
 namespace App\Controller;
 
 use App\Entity\Reseller;
+use App\Entity\SigninAttempt;
 use App\Repository\ResellerRepository;
+use App\Repository\SigninAttemptRepository;
 use App\Service\Paginator;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use OpenApi\Annotations as OA;
 use Psr\Log\LoggerInterface;
@@ -51,7 +54,7 @@ class ResellerController extends AbstractController
      *                      {"id": "156", "firstname":"Rachel", "lastname":"Dupont", "email":"rachel.d@free.fr", "_links": "..."},
      *                  },
      *                  "_links": "..."
-     *                  },             
+     *                  },
      *          ),
      *      ),
      *      @OA\Response(
@@ -123,15 +126,17 @@ class ResellerController extends AbstractController
      *          description="Successful operation",
      *          @OA\JsonContent(
      *              example={
-     *                  "current_page_number": "1", 
-     *                  "number_items_per_page": "10", 
-     *                  "total_items_count": "2", 
+     *                  "current_page_number": "1",
+     *                  "number_items_per_page": "10",
+     *                  "total_items_count": "2",
+     *                  "previous_page_link": "null",
+     *                  "next_page_link": "null",
      *                  "items": {
      *                      {"id": "22", "email": "exemple@phonecompany.com", "_links": "..."},
      *                      {"id": "23", "email": "dev@phonereseller.com", "_links": "..."},
      *                  },
      *              },
-     *          ), 
+     *          ),
      *      ),
      *      @OA\Response(
      *          response="404",
@@ -158,11 +163,12 @@ class ResellerController extends AbstractController
      */
     public function showResellers(ResellerRepository $resellerRepo, Request $request, SerializerInterface $serializer, Paginator $paginator): Response
     {
+        // we first test if the reseller has admin rights
         if (false === $this->isGranted('ROLE_ADMIN')) {
             return $this->json(['message' => 'you must be an admin to access this'], 403);
         }
 
-        // get data
+        // we now know that there is at least one reseller, there can not be empty data from pagination
         $resellers = $resellerRepo->findAll();
 
         // pagination
@@ -173,22 +179,18 @@ class ResellerController extends AbstractController
             $request
         );
 
-        if (null !== $resellers) {
-            $json = $serializer->serialize($paginated, 'json');
+        $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->setSerializeNull(true));
 
-            $response = new Response($json, 200, ['Content-Type' => 'application/json']);
+        $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
-            // cache publicly for 3600 seconds
-            $response->setPublic();
-            $response->setMaxAge($this->getParameter('cache_duration'));
+        // cache publicly for 3600 seconds
+        $response->setPublic();
+        $response->setMaxAge($this->getParameter('cache_duration'));
 
-            // (optional) set a custom Cache-Control directive
-            $response->headers->addCacheControlDirective('must-revalidate', true);
+        // (optional) set a custom Cache-Control directive
+        $response->headers->addCacheControlDirective('must-revalidate', true);
 
-            return $response;
-        }
-
-        return $this->json(['message' => 'there is no reseller for the moment'], 404);
+        return $response;
     }
 
     /**
@@ -235,8 +237,8 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator, LoggerInterface $logger): JsonResponse
-    {       
+    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator, LoggerInterface $logger, SigninAttemptRepository $signinAttemptRepo): JsonResponse
+    {
         $encoder = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
         $serializer = new Serializer($normalizers, $encoder);
@@ -248,26 +250,46 @@ class ResellerController extends AbstractController
         // check if input data is valid (email valid and unique, password complex enough)
         $errors = $validator->validate($reseller);
         if (count($errors) > 0) {
-            $logger->warning('registration input is invalid',[
-                'errors' => $errors
+            $logger->warning('registration input is invalid', [
+                'errors' => $errors,
             ]);
+
             return $this->json(['message' => $errors], 400);
+        }
+
+        // check if the requestor has not already signed up during last 10 minutes. Requestor is identified by its ip address, this is to prevent being DDoSed
+        $ipAddress = $request->getClientIp();
+        $count = $signinAttemptRepo->countRecentSigninAttempts($ipAddress, $this->getParameter('signin_temporisation'));
+        if ($count > 0) {
+            $logger->warning('Too many registration for one IP, suspicious DDoS', [
+                'IP Address' => $ipAddress,
+                'email' => $reseller->getEmail(),
+            ]);
+
+            return $this->json(['message' => 'You already registred with this IP address recently. Retry in 10 minutes'], 400);
         }
 
         // encode password
         $reseller->setPassword($passwordEncoder->encodePassword($reseller, $reseller->getPassword()));
 
+        // persist the reseller account and log this info
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($reseller);
         $manager->flush();
+        $logger->info('new reseller registrated', [
+            'IP Address' => $ipAddress,
+            'email' => $reseller->getEmail(),
+            ]);
 
-        $logger->info('new reseller registrated',[
-            'email' => $reseller->getEmail()
-        ]);
-        return $this->json(['result' => 'You registered as a Reseller with success'], 201);
+        // persist the date of the registration and the IP of the requestor, to prevent further DDoS using this method
+        $signinAttempt = new SigninAttempt($ipAddress, $reseller->getEmail());
+        $manager->persist($signinAttempt);
+        $manager->flush();
+
+        return $this->json(['message' => 'You registered as a Reseller with success'], 201);
     }
 
-    /**
+    /*
      * @OA\Post(
      *      path="/api/v1/auth/login",
      *      tags={"login and signin"},
@@ -281,7 +303,7 @@ class ResellerController extends AbstractController
      *             @OA\Schema(
      *                 type="object",
      *                 @OA\Property(
-     *                     property="username",
+     *                     property="email",
      *                     description="Enter the email you registred with as identifier",
      *                     type="string",
      *                 ),
@@ -290,7 +312,7 @@ class ResellerController extends AbstractController
      *                     description="Enter your password",
      *                     type="string"
      *                 ),
-     *                 example={"username": "exemple@mymail.com", "password": "mypassword"}
+     *                 example={"email": "exemple@mymail.com", "password": "mypassword"}
      *             ),
      *          ),
      *      ),

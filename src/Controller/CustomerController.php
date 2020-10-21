@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use Ambta\DoctrineEncryptBundle\Encryptors\EncryptorInterface;
 use App\Entity\Customer;
 use App\Repository\CustomerRepository;
 use App\Service\Paginator;
@@ -46,7 +45,7 @@ class CustomerController extends AbstractController
      *          @OA\JsonContent(
      *              ref="#/components/schemas/Customer",
      *              example={
-     *                  "id": "200", "firstname": "Michel", "lastname": "Cooper", "email": "m.cooper@exemple.com", "reseller": { "id":"24", "email":"exemple@reseller.com", "customer":"[]", "_links":"..."}, 
+     *                  "id": "200", "firstname": "Michel", "lastname": "Cooper", "email": "m.cooper@exemple.com", "reseller": { "id":"24", "email":"exemple@reseller.com", "customer":"[]", "_links":"..."},
      *                  "_links": {
      *                      "self": "...", "create":"...", "delete":"..."
      *                  },
@@ -111,13 +110,15 @@ class CustomerController extends AbstractController
      *          description="Successful operation",
      *          @OA\JsonContent(
      *              example={
-     *                  "current_page_number": "1", 
-     *                  "number_items_per_page": "10", 
-     *                  "total_items_count": "2", 
+     *                  "current_page_number": "1",
+     *                  "number_items_per_page": "10",
+     *                  "total_items_count": "2",
+     *                  "previous_page_link": "null",
+     *                  "next_page_link": "null",
      *                  "items": {
      *                      {"id": "200", "firstname":"Alice", "lastname":"Cooper", "email": "a.cooper@exemple.com", "reseller": {
      *                              "id":"24", "email":"dev@phonecompany.com", "customer":"[]", "_links": "{...}",
-     *                          }, 
+     *                          },
      *                          "_links": {
      *                              "self": "{...}",
      *                              "create": "{...}",
@@ -126,7 +127,7 @@ class CustomerController extends AbstractController
      *                      },
      *                      {"id": "202", "firstname":"Emily", "lastname":"Alphin", "email": "alphin@exemple.com", "reseller": {
      *                              "id":"24", "email":"dev@phonecompany.com", "customer":"[]", "_links": "{...}",
-     *                          }, 
+     *                          },
      *                          "_links": {
      *                              "self": "{...}",
      *                              "create": "{...}",
@@ -135,7 +136,7 @@ class CustomerController extends AbstractController
      *                      },
      *                  },
      *              },
-     *          ), 
+     *          ),
      *      ),
      *      @OA\Response(
      *          response=404,
@@ -173,8 +174,8 @@ class CustomerController extends AbstractController
             $request
         );
 
-        if (null !== $customers) {
-            $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->enableMaxDepthChecks());
+        if (null !== $paginated) {
+            $json = $serializer->serialize($paginated, 'json', SerializationContext::create()->enableMaxDepthChecks()->setSerializeNull(true));
 
             $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
@@ -253,25 +254,27 @@ class CustomerController extends AbstractController
         $reseller = $security->getUser();
 
         $context = new DeserializationContext();
-        $context->setGroups("create_customer");
+        $context->setGroups('create_customer');
 
         $customer = $serializer->deserialize($request->getContent(), Customer::class, 'json', $context);
         $customer->setReseller($reseller);
 
         $errors = $validator->validate($customer);
         if (count($errors) > 0) {
-            $logger->warning('Customer creation input is invalid',[
-                'errors' => $errors
+            $logger->warning('Customer creation input is invalid', [
+                'errors' => $errors,
             ]);
+
             return $this->json(['message' => $errors], 400);
         }
 
         // check if customer already exists and linked to this reseller.
         // a customer email must be unique but only to one reseller, indeed a customer can be registred to more than one reseller.
         if (null !== $customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail())) {
-            $logger->warning('customer already exists',[
-                'cause' => 'email : ' . $customer->getEmail() . ' already exists with reseller id = ' . $reseller->getId()
+            $logger->warning('customer already exists', [
+                'cause' => 'email : '.$customer->getEmail().' already exists with reseller id = '.$reseller->getId(),
             ]);
+
             return $this->json(['message' => 'This customer already exists'], 400);
         }
 
@@ -279,10 +282,11 @@ class CustomerController extends AbstractController
         $em->persist($customer);
         $em->flush();
 
-        $logger->info('new customer created',[
+        $logger->info('new customer created', [
             'email' => $customer->getEmail(),
-            'reseller' => $reseller->getId()
+            'reseller' => $reseller->getId(),
         ]);
+
         return $this->json(['message' => 'Customer created'], 201);
     }
 
@@ -343,12 +347,12 @@ class CustomerController extends AbstractController
 
         // check if the logged reseller is the one that owns the customer
         if ($reseller !== $customer->getReseller()) {
-
-            $logger->warning('customer deletion denied',[
+            $logger->warning('customer deletion denied', [
                 'customer id' => $customer->getId(),
                 'owning reseller id' => $customer->getReseller()->getId(),
-                'requestor reseller id' => $reseller->getId()
+                'requestor reseller id' => $reseller->getId(),
             ]);
+
             return $this->json(['message' => 'You are not authorized to delete this customer'], 403);
         }
 
@@ -356,10 +360,10 @@ class CustomerController extends AbstractController
         $em->remove($customer);
         $em->flush();
 
-        $logger->info('customer deleted',[
+        $logger->info('customer deleted', [
             'id' => $customerId,
             'email' => $customer->getEmail(),
-            'reseller' => $reseller->getId()
+            'reseller' => $reseller->getId(),
         ]);
 
         return $this->json([], 204);

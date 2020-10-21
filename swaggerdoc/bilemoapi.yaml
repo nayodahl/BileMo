@@ -120,6 +120,8 @@ paths:
                 current_page_number: '1'
                 number_items_per_page: '10'
                 total_items_count: '2'
+                previous_page_link: 'null'
+                next_page_link: 'null'
                 items:
                   - { id: '200', firstname: Alice, lastname: Cooper, email: a.cooper@exemple.com, reseller: { id: '24', email: dev@phonecompany.com, customer: '[]', _links: '{...}' }, _links: { self: '{...}', create: '{...}', delete: '{...}' } }
                   - { id: '202', firstname: Emily, lastname: Alphin, email: alphin@exemple.com, reseller: { id: '24', email: dev@phonecompany.com, customer: '[]', _links: '{...}' }, _links: { self: '{...}', create: '{...}', delete: '{...}' } }
@@ -263,6 +265,8 @@ paths:
                 current_page_number: '1'
                 number_items_per_page: '10'
                 total_items_count: '2'
+                previous_page_link: 'null'
+                next_page_link: 'null'
                 items:
                   - { id: '36', brand: Samsung, description: 'Samsung Galaxy S10', price: '759.0', internal_reference: S10-G981BLBDEUB, _links: ... }
                   - { id: '37', brand: Samsung, description: 'Samsung Galaxy S10+', price: '859.0', internal_reference: S10+-G981BLBDEUA, _links: ... }
@@ -357,6 +361,8 @@ paths:
                 current_page_number: '1'
                 number_items_per_page: '10'
                 total_items_count: '2'
+                previous_page_link: 'null'
+                next_page_link: 'null'
                 items:
                   - { id: '22', email: exemple@phonecompany.com, _links: ... }
                   - { id: '23', email: dev@phonereseller.com, _links: ... }
@@ -434,7 +440,7 @@ paths:
           application/json:
             schema:
               properties:
-                username:
+                email:
                   description: 'Enter the email you registred with as identifier'
                   type: string
                 password:
@@ -442,7 +448,7 @@ paths:
                   type: string
               type: object
               example:
-                username: exemple@mymail.com
+                email: exemple@mymail.com
                 password: mypassword
       responses:
         '200':
