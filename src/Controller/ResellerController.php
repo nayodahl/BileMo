@@ -269,7 +269,7 @@ class ResellerController extends AbstractController
         return $this->json(['result' => 'You registered as a Reseller with success'], 201);
     }
 
-    /**
+    /*
      * @OA\Post(
      *      path="/api/v1/auth/login",
      *      tags={"login and signin"},
