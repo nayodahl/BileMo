@@ -17,8 +17,10 @@
 
 .vscode
 node_modules
-*.code-workspace
+/bilemo.code-workspace
 
 ###> lexik/jwt-authentication-bundle ###
 /config/jwt/*.pem
 ###< lexik/jwt-authentication-bundle ###
+
+/.Halite.key
