@@ -3,7 +3,9 @@
 namespace App\Controller;
 
 use App\Entity\Reseller;
+use App\Entity\SigninAttempt;
 use App\Repository\ResellerRepository;
+use App\Repository\SigninAttemptRepository;
 use App\Service\Paginator;
 use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
@@ -235,7 +237,7 @@ class ResellerController extends AbstractController
      *      ),
      * )
      */
-    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator, LoggerInterface $logger): JsonResponse
+    public function register(UserPasswordEncoderInterface $passwordEncoder, Request $request, ValidatorInterface $validator, LoggerInterface $logger, SigninAttemptRepository $signinAttemptRepo): JsonResponse
     {
         $encoder = [new JsonEncoder()];
         $normalizers = [new ObjectNormalizer()];
@@ -255,18 +257,36 @@ class ResellerController extends AbstractController
             return $this->json(['message' => $errors], 400);
         }
 
+        // check if the requestor has not already signed up during last 10 minutes. Requestor is identified by its ip address, this is to prevent being DDoSed
+        $ipAddress = $request->getClientIp();
+        $count = $signinAttemptRepo->countRecentSigninAttempts($ipAddress, $this->getParameter('signin_temporisation'));
+        if ($count > 0) {
+            $logger->warning('Too many registration for one IP, suspicious DDoS', [
+                'IP Address' => $ipAddress,
+                'email' => $reseller->getEmail(),
+            ]);
+
+            return $this->json(['message' => 'You already registred with this IP address recently. Retry in 10 minutes'], 400);
+        }
+
         // encode password
         $reseller->setPassword($passwordEncoder->encodePassword($reseller, $reseller->getPassword()));
 
+        // persist the reseller account and log this info
         $manager = $this->getDoctrine()->getManager();
         $manager->persist($reseller);
         $manager->flush();
-
         $logger->info('new reseller registrated', [
+            'IP Address' => $ipAddress,
             'email' => $reseller->getEmail(),
-        ]);
+            ]);
 
-        return $this->json(['result' => 'You registered as a Reseller with success'], 201);
+        // persist the date of the registration and the IP of the requestor, to prevent further DDoS using this method
+        $signinAttempt = new SigninAttempt($ipAddress, $reseller->getEmail());
+        $manager->persist($signinAttempt);
+        $manager->flush();
+
+        return $this->json(['message' => 'You registered as a Reseller with success'], 201);
     }
 
     /*

@@ -6,6 +6,7 @@
 parameters:
     pagination_limit: 10
     cache_duration: 3600
+    signin_temporisation : 10
 
 services:
     # default configuration for services in *this* file
