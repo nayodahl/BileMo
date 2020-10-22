@@ -272,7 +272,7 @@ class CustomerController extends AbstractController
         // a customer email must be unique but only to one reseller, indeed a customer can be registred to more than one reseller.
         $customers = $customerRepo->findAllCustomersofOneReseller($reseller->getId())->getResult();
         $match = false;
-        foreach ($customers as $key => $value) {
+        foreach ($customers as $value) {
             if ($customer->getEmail() === $value->getEmail()) {
                 $match = true;
             }
