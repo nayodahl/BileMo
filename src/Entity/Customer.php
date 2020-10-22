@@ -93,6 +93,7 @@ class Customer
      * @ORM\Column(type="string", length=255)
      * @Groups({"show_resellers", "show_customers", "create_customer"})
      * @Type("string")
+     * @Encrypted
      * @Assert\NotBlank
      * @Assert\Email(
      *     message = "The email '{{ value }}' is not a valid email."

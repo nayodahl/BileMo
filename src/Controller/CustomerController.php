@@ -270,7 +270,14 @@ class CustomerController extends AbstractController
 
         // check if customer already exists and linked to this reseller.
         // a customer email must be unique but only to one reseller, indeed a customer can be registred to more than one reseller.
-        if (null !== $customerRepo->findOneByEmailandReseller($reseller->getId(), $customer->getEmail())) {
+        $customers = $customerRepo->findAllCustomersofOneReseller($reseller->getId())->getResult();
+        $match = false;
+        foreach ($customers as $key => $value) {
+            if ($customer->getEmail() === $value->getEmail()) {
+                $match = true;
+            }
+        }
+        if ($match === true) {
             $logger->warning('customer already exists', [
                 'cause' => 'email : '.$customer->getEmail().' already exists with reseller id = '.$reseller->getId(),
             ]);
@@ -278,6 +285,7 @@ class CustomerController extends AbstractController
             return $this->json(['message' => 'This customer already exists'], 400);
         }
 
+        // persist new customer and write some log
         $em = $this->getDoctrine()->getManager();
         $em->persist($customer);
         $em->flush();
