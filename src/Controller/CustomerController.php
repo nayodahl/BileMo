@@ -259,6 +259,7 @@ class CustomerController extends AbstractController
         $customer = $serializer->deserialize($request->getContent(), Customer::class, 'json', $context);
         $customer->setReseller($reseller);
 
+        // check if input data is valid, checking entity assertions
         $errors = $validator->validate($customer);
         if (count($errors) > 0) {
             $logger->warning('Customer creation input is invalid', [
