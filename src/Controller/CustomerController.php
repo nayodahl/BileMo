@@ -83,8 +83,8 @@ class CustomerController extends AbstractController
 
             $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
-            // cache publicly for 3600 seconds
-            $response->setPublic();
+            // cache privately (we don't want other user to get this response) for 3600 seconds
+            $response->setPrivate();
             $response->setMaxAge($this->getParameter('cache_duration'));
 
             // (optional) set a custom Cache-Control directive
@@ -179,8 +179,8 @@ class CustomerController extends AbstractController
 
             $response = new Response($json, 200, ['Content-Type' => 'application/json']);
 
-            // cache publicly for 3600 seconds
-            $response->setPublic();
+            // cache privately (we don't want other user to get this response) for 3600 seconds
+            $response->setPrivate();
             $response->setMaxAge($this->getParameter('cache_duration'));
 
             // (optional) set a custom Cache-Control directive
